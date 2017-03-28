@@ -17,9 +17,6 @@ public class NewsAPI {
     private static JSONObject json[] = null;
 
     private static JSONObject[] getJSON(String[] urls) throws IOException, JSONException {
-        if(json != null){
-            return json;
-        }
         json = new JSONObject[urls.length];
         for(int i=0; i<urls.length;i++){
             Request request = new Request.Builder().url(urls[i]).build();

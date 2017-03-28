@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"buzzfeed","cnn"};
+                String[] src = {"polygon", "ign"};
                 intent.putExtra("sources", src);
 
                 startActivity(intent);
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"buzzfeed","cnn"};
+                String[] src = {"mtv-news", "national-geographic"};
                 intent.putExtra("sources", src);
 
                 startActivity(intent);

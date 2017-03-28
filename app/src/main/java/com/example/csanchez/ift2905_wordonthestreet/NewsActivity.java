@@ -46,17 +46,17 @@ public class NewsActivity extends AppCompatActivity {
         @Override
         protected News[] doInBackground(Object... params) {
 
-            News[] lineups = new News[1];
+            News[] news = new News[0];
 
             try {
-                lineups = NewsAPI.getNews(src);
+                news = NewsAPI.getNews(src);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return lineups;
+            return news;
         }
 
         @Override
