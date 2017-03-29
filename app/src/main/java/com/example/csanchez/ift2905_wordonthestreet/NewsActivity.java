@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.xml.datatype.Duration;
 
@@ -54,6 +55,8 @@ public class NewsActivity extends AppCompatActivity {
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
+            } catch(ParseException e){
+                e.printStackTrace();
             }
 
             return news;
@@ -85,11 +88,9 @@ public class NewsActivity extends AppCompatActivity {
                         convertView = getLayoutInflater().inflate(R.layout.single_news, parent, false);
 
                     TextView title = (TextView) convertView.findViewById(R.id.title);
-                    TextView description = (TextView) convertView.findViewById(R.id.description);
                     ImageView image = (ImageView) convertView.findViewById(R.id.image);
 
                     title.setText(news[position].title);
-                    description.setText(news[position].description);
 
                     Picasso.with(getApplicationContext())
                             .load(news[position].image)

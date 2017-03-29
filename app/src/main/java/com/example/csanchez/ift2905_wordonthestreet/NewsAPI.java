@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,6 +34,7 @@ public class NewsAPI {
         return json;
     }
 
+    //Returns all sources
     public static Source[] getSources() throws IOException, JSONException{
         String[] allSourcesUrl = {"https://newsapi.org/v1/sources?&language=en"};
         JSONArray json = getJSON(allSourcesUrl)[0].getJSONArray("sources");
@@ -44,12 +46,13 @@ public class NewsAPI {
                     ((JSONObject)json.get(i)).getString("id"),
                     ((JSONObject)json.get(i)).getString("name"),
                     ((JSONObject)json.get(i)).getString("description"),
-                    ((JSONObject)json.get(i)).getString("categorie"),
+                    ((JSONObject)json.get(i)).getString("url"),
+                    ((JSONObject)json.get(i)).getString("category"),
                     ((JSONObject)json.get(i)).getString("language"),
                     ((JSONObject)json.get(i)).getString("country"),
-                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogo").getString("smallLogo"),
-                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogo").getString("mediumLogo"),
-                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogo").getString("largeLogo")
+                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogos").getString("small"),
+                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogos").getString("medium"),
+                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogos").getString("large")
             );
         }
 
@@ -57,10 +60,11 @@ public class NewsAPI {
 
     }
 
+    //Returns sources by category
     public static Source[] getSources(String[] categories) throws IOException, JSONException{
         String[] urls = new String[categories.length];
         for(int i=0; i<urls.length;i++){
-            urls[i] = "https://newsapi.org/v1/sources?"+categories[i]+"&language=en";
+            urls[i] = "https://newsapi.org/v1/sources?category="+categories[i]+"&language=en";
         }
 
         JSONObject[] sourcesByCat = getJSON(urls);
@@ -77,15 +81,16 @@ public class NewsAPI {
 
             for(int j=0; j<catArr.length();j++) {
                 sources[sourceCount] = new Source(
-                        ((JSONObject)catArr.get(i)).getString("id"),
-                        ((JSONObject)catArr.get(i)).getString("name"),
-                        ((JSONObject)catArr.get(i)).getString("description"),
-                        ((JSONObject)catArr.get(i)).getString("categorie"),
-                        ((JSONObject)catArr.get(i)).getString("language"),
-                        ((JSONObject)catArr.get(i)).getString("country"),
-                        ((JSONObject)catArr.get(i)).getJSONObject("urlsToLogo").getString("smallLogo"),
-                        ((JSONObject)catArr.get(i)).getJSONObject("urlsToLogo").getString("mediumLogo"),
-                        ((JSONObject)catArr.get(i)).getJSONObject("urlsToLogo").getString("largeLogo")
+                        ((JSONObject)catArr.get(j)).getString("id"),
+                        ((JSONObject)catArr.get(j)).getString("name"),
+                        ((JSONObject)catArr.get(j)).getString("description"),
+                        ((JSONObject)catArr.get(j)).getString("url"),
+                        ((JSONObject)catArr.get(j)).getString("category"),
+                        ((JSONObject)catArr.get(j)).getString("language"),
+                        ((JSONObject)catArr.get(j)).getString("country"),
+                        ((JSONObject)catArr.get(j)).getJSONObject("urlsToLogos").getString("small"),
+                        ((JSONObject)catArr.get(j)).getJSONObject("urlsToLogos").getString("medium"),
+                        ((JSONObject)catArr.get(j)).getJSONObject("urlsToLogos").getString("large")
                 );
                 sourceCount++;
             }
@@ -94,7 +99,7 @@ public class NewsAPI {
         return sources;
     }
 
-    public static News[] getNews(String[] sources) throws IOException, JSONException{
+    public static News[] getNews(String[] sources) throws IOException, JSONException, ParseException {
 
         String[] urls = new String[sources.length];
         for(int i=0; i<urls.length;i++){
@@ -113,15 +118,19 @@ public class NewsAPI {
             JSONArray fromSource = sourcesArticles[i].getJSONArray("articles");
 
             for(int j=0; j<fromSource.length();j++) {
-                news[newsCount] = new News(
-                        ((JSONObject) fromSource.get(j)).getString("title"),
-                        ((JSONObject) fromSource.get(j)).getString("description"),
-                        sources[i],
-                        ((JSONObject) fromSource.get(j)).getString("author"),
-                        ((JSONObject) fromSource.get(j)).getString("urlToImage"),
-                        ((JSONObject) fromSource.get(j)).getString("url"),
-                        ((JSONObject) fromSource.get(j)).getString("publishedAt")
-                );
+                try {
+                    news[newsCount] = new News(
+                            ((JSONObject) fromSource.get(j)).getString("title"),
+                            ((JSONObject) fromSource.get(j)).getString("description"),
+                            sources[i],
+                            ((JSONObject) fromSource.get(j)).getString("author"),
+                            ((JSONObject) fromSource.get(j)).getString("urlToImage"),
+                            ((JSONObject) fromSource.get(j)).getString("url"),
+                            ((JSONObject) fromSource.get(j)).getString("publishedAt")
+                    );
+                }catch(ParseException e){
+                    e.printStackTrace();
+                }
                 newsCount++;
             }
         }

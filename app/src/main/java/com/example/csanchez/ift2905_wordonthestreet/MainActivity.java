@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button buzzFeedCNN = (Button) findViewById(R.id.cat1);
         Button engadgetTheVerge = (Button) findViewById(R.id.cat2);
-        Button timeWired = (Button) findViewById(R.id.cat3);
+        Button polygonIGN = (Button) findViewById(R.id.cat3);
         Button allSources = (Button) findViewById(R.id.allSources);
         Button gaming = (Button) findViewById(R.id.gaming);
 
@@ -44,11 +44,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        timeWired.setOnClickListener(new View.OnClickListener() {
+        polygonIGN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"time","wired-de"};
+                String[] src = {"polygon","ign"};
                 intent.putExtra("sources", src);
 
                 startActivity(intent);
@@ -58,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
         allSources.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"polygon", "ign"};
-                intent.putExtra("sources", src);
+                Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
+                String[] src = {};
+                intent.putExtra("categories", src);
 
                 startActivity(intent);
             }
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         gaming.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"mtv-news", "national-geographic"};
-                intent.putExtra("sources", src);
+                Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
+                String[] src = {"gaming"};
+                intent.putExtra("categories", src);
 
                 startActivity(intent);
             }

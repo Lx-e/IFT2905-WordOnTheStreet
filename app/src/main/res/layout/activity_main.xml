@@ -29,7 +29,7 @@
             android:id="@+id/cat3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Time, Wired" />
+            android:text="Polygon, IGN" />
 
         <Button
             android:id="@+id/allSources"
