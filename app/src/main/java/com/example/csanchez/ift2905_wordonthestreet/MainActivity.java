@@ -1,5 +1,8 @@
 package com.example.csanchez.ift2905_wordonthestreet;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -23,6 +29,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        toolbar.setBackground(new ColorDrawable(0x000000FF));
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setSubtitle("");
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0x000000FF));
+//        getSupportActionBar().setBackgroundDrawable(getDrawable(R.drawable.wots));
+        getSupportActionBar().setLogo(getDrawable(R.drawable.wots));
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +117,9 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        changeTypeface(navigationView);
+
     }
 
     @Override
@@ -159,4 +175,40 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void applyFontToItem(MenuItem item, Typeface font) {
+        SpannableString mNewTitle = new SpannableString(item.getTitle());
+        mNewTitle.setSpan(new CustomTypefaceSpan("", font, 30), 0 ,
+                mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        item.setTitle(mNewTitle);
+    }
+
+    private void changeTypeface(NavigationView navigationView){
+        FontTypeface fontTypeface = new FontTypeface(this);
+        Typeface typeface = fontTypeface.getTypefaceAndroid();
+
+        MenuItem item;
+
+        item = navigationView.getMenu().findItem(R.id.nav_book);
+        item.setTitle("Bookmarks");
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_fav);
+//        item.setTitle("Galery");
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_history);
+//        item.setTitle("Slideshow");
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_settings);
+//        item.setTitle("Manage");
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_tags);
+//        item.setTitle("Share");
+        applyFontToItem(item, typeface);
+
+    }
+
 }
