@@ -88,9 +88,11 @@ public class NewsActivity extends AppCompatActivity {
                         convertView = getLayoutInflater().inflate(R.layout.single_news, parent, false);
 
                     TextView title = (TextView) convertView.findViewById(R.id.title);
+                    TextView date = (TextView) convertView.findViewById(R.id.date);
                     ImageView image = (ImageView) convertView.findViewById(R.id.image);
 
                     title.setText(news[position].title);
+                    date.setText(news[position].date.toString());
 
                     Picasso.with(getApplicationContext())
                             .load(news[position].image)

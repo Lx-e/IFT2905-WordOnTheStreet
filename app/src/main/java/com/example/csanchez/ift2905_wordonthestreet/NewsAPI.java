@@ -7,6 +7,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -128,12 +132,22 @@ public class NewsAPI {
                             ((JSONObject) fromSource.get(j)).getString("url"),
                             ((JSONObject) fromSource.get(j)).getString("publishedAt")
                     );
+                    System.out.println(news[newsCount].source +" "+ news[newsCount].date+" "+news[newsCount].url);
                 }catch(ParseException e){
                     e.printStackTrace();
                 }
                 newsCount++;
             }
         }
+
+
+        Arrays.sort(news, new Comparator<News>() {
+            @Override
+            public int compare(News o1, News o2) {
+                int result = -1;
+                return result = o1.date.compareTo(o2.date);
+            }
+        });
 
         return news;
 
