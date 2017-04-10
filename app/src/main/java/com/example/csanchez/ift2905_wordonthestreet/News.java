@@ -25,12 +25,13 @@ public class News {
         this.url         = _url;
         if(_date != null) {
             try {
-                Date date = df.parse(_date);
+                this.date = df.parse(_date);
             } catch (ParseException e) {
-                e.printStackTrace();
+                //Got null date, putting actual time and date as placeholder
+                this.date = new Date();
             }
         }else{
-            this.date = null;
+            this.date = new Date();
         }
 
     }
