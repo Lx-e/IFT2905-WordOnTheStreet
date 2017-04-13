@@ -53,10 +53,7 @@ public class NewsAPI {
                     ((JSONObject)json.get(i)).getString("url"),
                     ((JSONObject)json.get(i)).getString("category"),
                     ((JSONObject)json.get(i)).getString("language"),
-                    ((JSONObject)json.get(i)).getString("country"),
-                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogos").getString("small"),
-                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogos").getString("medium"),
-                    ((JSONObject)json.get(i)).getJSONObject("urlsToLogos").getString("large")
+                    ((JSONObject)json.get(i)).getString("country")
             );
         }
 
@@ -91,10 +88,7 @@ public class NewsAPI {
                         ((JSONObject)catArr.get(j)).getString("url"),
                         ((JSONObject)catArr.get(j)).getString("category"),
                         ((JSONObject)catArr.get(j)).getString("language"),
-                        ((JSONObject)catArr.get(j)).getString("country"),
-                        ((JSONObject)catArr.get(j)).getJSONObject("urlsToLogos").getString("small"),
-                        ((JSONObject)catArr.get(j)).getJSONObject("urlsToLogos").getString("medium"),
-                        ((JSONObject)catArr.get(j)).getJSONObject("urlsToLogos").getString("large")
+                        ((JSONObject)catArr.get(j)).getString("country")
                 );
                 sourceCount++;
             }
@@ -145,7 +139,7 @@ public class NewsAPI {
             @Override
             public int compare(News o1, News o2) {
                 int result = -1;
-                return result = o1.date.compareTo(o2.date);
+                return result = o2.date.compareTo(o1.date);
             }
         });
 
