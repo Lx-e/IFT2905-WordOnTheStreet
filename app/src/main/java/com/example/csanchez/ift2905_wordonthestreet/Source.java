@@ -8,9 +8,6 @@ public class Source {
     String category;
     String language;
     String country;
-    String smallLogo;
-    String mediumLogo;
-    String largeLogo;
 
     public Source(String _id, String _name, String _description, String _url, String _categorie, String _language, String _country){
         this.id          = _id;

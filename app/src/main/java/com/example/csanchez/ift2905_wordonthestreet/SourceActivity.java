@@ -1,6 +1,7 @@
 package com.example.csanchez.ift2905_wordonthestreet;
 
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -62,28 +63,15 @@ public class SourceActivity extends AppCompatActivity {
                     sources = NewsAPI.getSources(categories);
                 }
 
-                File f = new File(c.getFilesDir().getPath() + "/custom_sources.dat");
-                //check whether file exists
-                FileInputStream is = new FileInputStream(f);
-                int size = is.available();
-                byte[] buffer = new byte[size];
-                int isFile = is.read(buffer);
-                is.close();
-                Log.v("TAG", "isFile: " + isFile);
-                if(isFile > 0) {
-                    String readStr = new String(buffer);
-                    readStr = readStr.subSequence(1, buffer.length - 1).toString();
-                    Log.v("TAG", "STRING READ: " + readStr);
-                    customSources = new ArrayList<String>();
-                    String[] toLoad = readStr.split(",");
-                    for (int i = 0; i < toLoad.length; i++) {
-                        toLoad[i] = toLoad[i].subSequence(1, toLoad[i].length() - 1).toString();
-                        Log.v("TAG", "Parsed: " + toLoad[i]);
-                        customSources.add(toLoad[i]);
-                        int checkBoxIndex = findSourceIndex(sources, toLoad[i]);
-                        if(checkBoxIndex > -1){
-                            checked[checkBoxIndex] = true;
-                        }
+                SharedPreferences prefs = getSharedPreferences("SavedData", MODE_PRIVATE);
+                String sourcesStr = prefs.getString("CustomSources", "Nothing");//"No name defined" is the default value.
+                Log.v("TAG", "RETRIEVED: "+sourcesStr);
+                customSources = new ArrayList<String>();
+                if(!sourcesStr.equals("Nothing")) {
+                    String[] sourcesArr = sourcesStr.split(",");
+                    for (int i = 0; i < sourcesArr.length; i++) {
+                        Log.v("TAG", "Parsed: " + sourcesArr[i]);
+                        customSources.add(sourcesArr[i]);
                     }
                 }
 
@@ -95,7 +83,10 @@ public class SourceActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            checked =  new boolean[sources.length];
+            checked = new boolean[sources.length];
+            for(boolean cb : checked){
+                cb=false;
+            }
             return sources;
         }
 
@@ -104,31 +95,35 @@ public class SourceActivity extends AppCompatActivity {
             Button saveBtn = (Button) findViewById(R.id.save_button);
             Button clearBtn = (Button) findViewById(R.id.clear_custom);
 
-            saveBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        FileWriter file = new FileWriter(c.getFilesDir()+"/custom_sources.dat");
-                        file.write(new Gson().toJson(customSources));
-
-                        Log.v("TAG","WRITTEN TO FILE: "+(new Gson().toJson(customSources)));
-                        file.flush();
-                        file.close();
-                    } catch (IOException e) {
-                        Log.e("TAG", "Error in Writing: " + e.getLocalizedMessage());
-                    }
-                }
-            });
-
             clearBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                        File file = new File(c.getFilesDir()+"/custom_sources.dat");
-                        file.delete();
-
+                    SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
+                    editor.remove("CustomSources");
+                    editor.commit();
+                    customSources =  new ArrayList<String>();
+                    Log.v("TAG", "REMOVING: "+checkBoxesToSourceName(sources));
                 }
             });
 
+            saveBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
+                    editor.remove("CustomSources");
+                    editor.putString("CustomSources", checkBoxesToSourceName(sources));
+                    editor.commit();
+                    Log.v("TAG", "SAVING: "+checkBoxesToSourceName(sources));
+                }
+            });
+
+            for(String source : customSources) {
+                int i = getSourceIndex(sources, source);
+                if(i > -1){
+                    Log.v("TAG", "Found "+source+" at "+i);
+                    checked[i] = true;
+                }
+            }
             list.setAdapter(new BaseAdapter() {
                 @Override
                 public int getCount() {
@@ -168,15 +163,15 @@ public class SourceActivity extends AppCompatActivity {
                     CheckBox cb = (CheckBox) view.findViewById(R.id.checkbox);
                     if (cb.isChecked()) {
                         cb.setChecked(false);
-                        customSources.remove(((TextView) view.findViewById(R.id.name)).getText().toString());
-                        checked[position] = true;
+                        customSources.remove(sources[position].name);
+                        checked[position] = false;
                         for(String source : customSources) {
                             Log.v("TAG",source);
                         }
                     }else{
                         cb.setChecked(true);
-                        customSources.add(((TextView) view.findViewById(R.id.name)).getText().toString());
-                        checked[position] = false;
+                        customSources.add(sources[position].name);
+                        checked[position] = true;
                         Log.v("TAG",(new Gson().toJson(customSources)));
                         for(String source : customSources) {
                             Log.v("TAG","In customSources: "+source);
@@ -188,10 +183,20 @@ public class SourceActivity extends AppCompatActivity {
         }
     }
 
-    public int findSourceIndex(Source[] src, String name){
-        for(int j=0; j<src.length; j++){
-            if(src[j].name == name){
-                return j;
+    public String checkBoxesToSourceName(Source[] arr){
+        String str = "";
+        for(int i=0; i<checked.length; i++) {
+            if(checked[i] == true){
+                str += arr[i].id+",";
+            }
+        }
+
+        return str.length() > 0 ? str.substring(0, str.length()-1): "";
+    }
+    public int getSourceIndex(Source[] src, String id){
+        for(int i=0; i<src.length; i++){
+            if(src[i].id.equals(id)){
+                return i;
             }
         }
         return -1;

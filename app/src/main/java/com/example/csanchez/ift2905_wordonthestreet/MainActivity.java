@@ -1,11 +1,13 @@
 package com.example.csanchez.ift2905_wordonthestreet;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +21,8 @@ import android.widget.Button;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -58,8 +62,9 @@ public class MainActivity extends AppCompatActivity
         Button buzzFeedCNN = (Button) findViewById(R.id.cat1);
         Button engadgetTheVerge = (Button) findViewById(R.id.cat2);
         Button polygonIGN = (Button) findViewById(R.id.cat3);
-        Button allSources = (Button) findViewById(R.id.allSources);
         Button gaming = (Button) findViewById(R.id.gaming);
+        Button selectCustomSources = (Button) findViewById(R.id.select);
+        Button showCustomSources = (Button) findViewById(R.id.custom);
 
 
 
@@ -96,12 +101,26 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        allSources.setOnClickListener(new View.OnClickListener() {
+        selectCustomSources.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
                 String[] src = {};
                 intent.putExtra("categories", src);
+
+                startActivity(intent);
+            }
+        });
+
+        showCustomSources.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
+                SharedPreferences prefs = getSharedPreferences("SavedData", MODE_PRIVATE);
+                String sourcesStr = prefs.getString("CustomSources", "No name defined");//"No name defined" is the default value.
+                Log.v("TAG", "RETRIEVED: "+sourcesStr);
+                String[] src = sourcesStr.split(",");
+                intent.putExtra("sources", src);
 
                 startActivity(intent);
             }
