@@ -7,6 +7,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.csanchez.ift2905_wordonthestreet.MainActivity">
     tools:showIn="@layout/app_bar_main">
+
     <Button
         android:id="@+id/custom"
         android:layout_width="348dp"
@@ -24,11 +25,13 @@
         android:layout_height="45dp"
         android:text="Select Custom Sources"
         app:layout_constraintTop_toTopOf="parent"
+
         android:layout_marginTop="272dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent" />
+
 
     <Button
         android:id="@+id/gaming"
@@ -42,40 +45,62 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="168dp" />
 
+
     <Button
         android:id="@+id/cat3"
         android:layout_width="348dp"
-        android:layout_height="45dp"
+        android:layout_height="48dp"
         android:text="POLYGON, IGN"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="114dp" />
+        android:layout_marginTop="114dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <Button
         android:id="@+id/cat2"
         android:layout_width="348dp"
-        android:layout_height="45dp"
+        android:layout_height="48dp"
         android:text="ENGADGET, THE VERGE"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="61dp" />
+        android:layout_marginTop="61dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <Button
         android:id="@+id/cat1"
         android:layout_width="348dp"
-        android:layout_height="45dp"
+        android:layout_height="48dp"
         android:text="BuzzFeed, CNN"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <ListView
+        android:id="@+id/listView_main"
+        android:layout_width="374dp"
+        android:layout_height="227dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.981"
+        tools:layout_editor_absoluteY="416dp" />
 
 </android.support.constraint.ConstraintLayout>
