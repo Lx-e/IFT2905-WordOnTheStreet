@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/listView_news"
+        android:layout_width="match_parent"
+        android:layout_height="466dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SAVE"
+            android:layout_width="match_parent" />
+
+        <Button
+            android:id="@+id/clear_custom"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CLEAR CUSTOM"
+            android:layout_width="match_parent" />
+    </LinearLayout>
+
+</LinearLayout>

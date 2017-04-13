@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,7 +35,7 @@ public class NewsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_news);
 
         src = getIntent().getExtras().getStringArray("sources");
-        System.out.println("HOOOO: "+src[0]);
+        Log.v("TAG","HOOOO: "+src[0]);
 
         list = (ListView) findViewById(R.id.listView_news);
 

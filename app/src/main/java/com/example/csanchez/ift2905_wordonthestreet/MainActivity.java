@@ -1,11 +1,15 @@
 package com.example.csanchez.ift2905_wordonthestreet;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,13 +19,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    ListView list;
+    private String[] srcArr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,71 +76,98 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Button buzzFeedCNN = (Button) findViewById(R.id.cat1);
-        Button engadgetTheVerge = (Button) findViewById(R.id.cat2);
-        Button polygonIGN = (Button) findViewById(R.id.cat3);
-        Button allSources = (Button) findViewById(R.id.allSources);
-        Button gaming = (Button) findViewById(R.id.gaming);
+        list = (ListView)findViewById(R.id.listView_main);
 
-
-
-        buzzFeedCNN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"buzzfeed","cnn"};
-                intent.putExtra("sources", src);
-
-                startActivity(intent);
-            }
-        });
-
-        engadgetTheVerge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"engadget","the-verge"};
-                intent.putExtra("sources", src);
-
-                startActivity(intent);
-            }
-        });
-
-        polygonIGN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewsActivity.class);
-                String[] src = {"polygon","ign"};
-                intent.putExtra("sources", src);
-
-                startActivity(intent);
-            }
-        });
-
-        allSources.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
-                String[] src = {};
-                intent.putExtra("categories", src);
-
-                startActivity(intent);
-            }
-        });
-
-        gaming.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
-                String[] src = {"gaming"};
-                intent.putExtra("categories", src);
-
-                startActivity(intent);
-            }
-        });
+        NewsFetcher news = new NewsFetcher();
+        news.execute();
 
         changeTypeface(navigationView);
 
+    }
+
+    public class NewsFetcher extends AsyncTask<Object, Object, News[]> {
+
+        @Override
+        protected News[] doInBackground(Object... params) {
+
+            News[] news = new News[0];
+
+            try {
+                SharedPreferences prefs = getSharedPreferences("SavedData", MODE_PRIVATE);
+                String sourcesStr = prefs.getString("CustomSources", "Nothing");//"No name defined" is the default value.
+                Log.v("TAG", "RETRIEVED: "+sourcesStr);
+
+                if(sourcesStr.equals("Nothing")){
+                    Log.v("TAG", "Really got : "+sourcesStr);
+                    try{
+                        String[] cat ={"general"};
+                        Source[] sources = NewsAPI.getSources(cat); //Retrieve all sources(default)
+
+                        srcArr = new String[sources.length];
+                        for(int i=0; i<sources.length; i++){
+                            srcArr[i] = sources[i].id;
+                        }
+                        Log.v("TAG", Arrays.toString(srcArr));
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }else{
+                    srcArr = sourcesStr.split(","); //Retrieve favorite sources
+                }
+                news = NewsAPI.getNews(srcArr);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            return news;
+        }
+
+        @Override
+        protected void onPostExecute(final News[] news) {
+
+            list.setAdapter(new BaseAdapter() {
+                @Override
+                public int getCount() {
+                    return news.length;
+                }
+
+                @Override
+                public Object getItem(int position) {
+                    return null;
+                }
+
+                @Override
+                public long getItemId(int position) {
+                    return 0;
+                }
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+
+                    if (convertView == null)
+                        convertView = getLayoutInflater().inflate(R.layout.single_news, parent, false);
+
+                    TextView title = (TextView) convertView.findViewById(R.id.title);
+                    TextView date = (TextView) convertView.findViewById(R.id.date);
+                    ImageView image = (ImageView) convertView.findViewById(R.id.image);
+
+                    title.setText(news[position].title);
+                    date.setText(news[position].date.toString());
+
+                    Picasso.with(getApplicationContext())
+                            .load(news[position].image)
+                            .into(image);
+
+                    return convertView;
+                }
+            });
+
+        }
     }
 
     @Override
@@ -147,9 +195,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -161,14 +209,25 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_fav) {
-            // Handle the camera action
+            Toast.makeText(getApplicationContext(), "favorites", Toast.LENGTH_SHORT).show();
+
+            //Intent intent = new Intent(getApplicationContext(), FilterActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
+            startActivity(intent);
+
+
         } else if (id == R.id.nav_tags) {
+            Toast.makeText(getApplicationContext(), "tags", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_history) {
+            Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
+
 
         } else if (id == R.id.nav_book) {
+            Toast.makeText(getApplicationContext(), "bookmarks", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_settings) {
+            Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -210,5 +269,7 @@ public class MainActivity extends AppCompatActivity
         applyFontToItem(item, typeface);
 
     }
+
+
 
 }
