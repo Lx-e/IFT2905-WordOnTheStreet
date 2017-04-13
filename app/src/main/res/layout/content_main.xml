@@ -7,6 +7,28 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.csanchez.ift2905_wordonthestreet.MainActivity">
     tools:showIn="@layout/app_bar_main">
+    <Button
+        android:id="@+id/custom"
+        android:layout_width="348dp"
+        android:layout_height="45dp"
+        android:text="Show Custom Sources"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="324dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+    <Button
+        android:id="@+id/select"
+        android:layout_width="348dp"
+        android:layout_height="45dp"
+        android:text="Select Custom Sources"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="272dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button
         android:id="@+id/gaming"
@@ -67,4 +89,5 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
