@@ -21,7 +21,7 @@ package="com.example.csanchez.ift2905_wordonthestreet">
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
     </activity>
-    <activity android:name=".FilterActivity" />
+    <activity android:name=".SingleNewsExpand" />
 </application>
 
 </manifest>

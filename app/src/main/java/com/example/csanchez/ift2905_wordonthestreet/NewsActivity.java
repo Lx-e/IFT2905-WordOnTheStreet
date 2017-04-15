@@ -41,6 +41,8 @@ public class NewsActivity extends AppCompatActivity {
 
         NewsFetcher news = new NewsFetcher();
         news.execute();
+
+
     }
 
     public class NewsFetcher extends AsyncTask<Object, Object, News[]> {

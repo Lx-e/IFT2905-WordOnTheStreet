@@ -1,9 +1,12 @@
 package com.example.csanchez.ift2905_wordonthestreet;
 
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -28,9 +31,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.csanchez.ift2905_wordonthestreet.R.id.parent;
+
 
 public class SourceActivity extends AppCompatActivity {
-    private String categories[] = {"gaming"};
+    private String categories[] = {};
     ListView list;
     List<String> customSources = new ArrayList();
     boolean checked[];
@@ -40,7 +45,7 @@ public class SourceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sources);
 
-        categories = getIntent().getExtras().getStringArray("categories");
+        //categories = getIntent().getExtras().getStringArray("categories");
 
         list = (ListView) findViewById(R.id.listView_news);
 
@@ -101,6 +106,7 @@ public class SourceActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
                     editor.remove("CustomSources");
                     editor.commit();
+                    clearCheckboxes(list);
                     customSources =  new ArrayList<String>();
                     Log.v("TAG", "REMOVING: "+checkBoxesToSourceName(sources));
                 }
@@ -155,6 +161,8 @@ public class SourceActivity extends AppCompatActivity {
                     cb.setChecked(checked[position]);
                     return convertView;
                 }
+
+
             });
 
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -191,7 +199,7 @@ public class SourceActivity extends AppCompatActivity {
             }
         }
 
-        return str.length() > 0 ? str.substring(0, str.length()-1): "";
+        return str.length() > 0 ? str.substring(0, str.length()-1): "Nothing";
     }
     public int getSourceIndex(Source[] src, String id){
         for(int i=0; i<src.length; i++){
@@ -200,5 +208,24 @@ public class SourceActivity extends AppCompatActivity {
             }
         }
         return -1;
+    }
+
+    //Inspiré de http://stackoverflow.com/questions/14509552/uncheck-all-checbox-in-listview-in-android
+    private void clearCheckboxes(ViewGroup vg) {
+        for (int i = 0; i < vg.getChildCount(); i++) {
+            View v = vg.getChildAt(i);
+            if (v instanceof CheckBox) {
+                ((CheckBox) v).setChecked(false);
+            } else if (v instanceof ViewGroup) {
+                clearCheckboxes((ViewGroup) v);
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }
