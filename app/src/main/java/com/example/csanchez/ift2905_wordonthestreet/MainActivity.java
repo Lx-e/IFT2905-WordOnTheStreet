@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -80,8 +81,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         list = (ListView)findViewById(R.id.listView_main);
 
-
-
         final NewsFetcher news = new NewsFetcher();
         news.execute();
 
@@ -106,26 +105,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent.putExtra("desc", desc);
                 intent.putExtra("link", link);
                 startActivity(intent);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             }
         });
     }
@@ -193,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
-
                     if (convertView == null)
                         convertView = getLayoutInflater().inflate(R.layout.single_news, parent, false);
 
