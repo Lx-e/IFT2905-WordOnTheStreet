@@ -20,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.graphics.Typeface;
@@ -38,6 +39,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -78,11 +81,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         list = (ListView)findViewById(R.id.listView_main);
 
-        NewsFetcher news = new NewsFetcher();
+        final NewsFetcher news = new NewsFetcher();
         news.execute();
 
         changeTypeface(navigationView);
 
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+
+
+                TextView t = (TextView) view.findViewById(R.id.hiddenurl);
+                String link = t.getText().toString();
+                t = (TextView)view.findViewById(R.id.date);
+                String newsDate = t.getText().toString();
+                t = (TextView)view.findViewById(R.id.hiddenDescription);
+                String desc = t.getText().toString();
+
+
+                Intent intent = new Intent(getApplicationContext(), SingleNewsExpand.class);
+
+                intent.putExtra("date", newsDate);
+                intent.putExtra("desc", desc);
+                intent.putExtra("link", link);
+                startActivity(intent);
+            }
+        });
     }
 
     public class NewsFetcher extends AsyncTask<Object, Object, News[]> {
@@ -148,17 +172,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
-
                     if (convertView == null)
                         convertView = getLayoutInflater().inflate(R.layout.single_news, parent, false);
 
                     TextView title = (TextView) convertView.findViewById(R.id.title);
                     TextView date = (TextView) convertView.findViewById(R.id.date);
                     ImageView image = (ImageView) convertView.findViewById(R.id.image);
+                    TextView hidDescription = (TextView) convertView.findViewById(R.id.hiddenDescription);
+                    TextView hidUrl = (TextView) convertView.findViewById(R.id.hiddenurl);
 
                     title.setText(news[position].title);
                     date.setText(news[position].date.toString());
-
+                    hidDescription.setText(news[position].description);
+                    hidUrl.setText(news[position].url);
                     Picasso.with(getApplicationContext())
                             .load(news[position].image)
                             .into(image);
