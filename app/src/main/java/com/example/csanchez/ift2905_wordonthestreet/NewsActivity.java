@@ -2,6 +2,7 @@ package com.example.csanchez.ift2905_wordonthestreet;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,9 +27,10 @@ import java.text.ParseException;
 
 import javax.xml.datatype.Duration;
 
-public class NewsActivity extends AppCompatActivity {
+public class NewsActivity extends AppCompatActivity{
     private String src[] = {"gaming"};
     ListView list;
+    Button share;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

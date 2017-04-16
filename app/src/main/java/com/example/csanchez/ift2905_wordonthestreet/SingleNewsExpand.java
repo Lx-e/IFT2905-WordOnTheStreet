@@ -17,9 +17,14 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Checkable;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+import android.widget.CompoundButton;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
@@ -43,10 +48,16 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
 
     private TextView textviewDate;
     private TextView textviewDesc;
+    boolean book=false;
     Button inapp;
     Button brow;
+    Button share;
+    Button toggle;
     WebView webview;
     String link;
+    String date;
+    String desc;
+    static int i;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,19 +68,30 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
 
         inapp = (Button)findViewById(R.id.button3);
         brow = (Button)findViewById(R.id.button2);
+        share =(Button)findViewById(R.id.button4);
+        toggle = (Button)findViewById(R.id.button5);
 
         inapp.setOnClickListener(this);
         brow.setOnClickListener(this);
+        share.setOnClickListener(this);
+        toggle.setOnClickListener(this);
+
+
+
+
         webview = (WebView)findViewById(R.id.webv);
         Intent i = getIntent();
         Bundle b = i.getExtras();
         if(b!=null){
-            String k = (String) b.get("date");
-            textviewDate.setText(k);
-            String l = (String) b.get("desc");
-            textviewDesc.setText(l);
+            date = (String) b.get("date");
+            textviewDate.setText(date);
+            desc = (String) b.get("desc");
+            textviewDesc.setText(desc);
             link = (String) b.get("link");
         }
+
+
+
     }
     @Override
     public void onClick(View v){
@@ -82,7 +104,45 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
                 break;
+            case R.id.button4:
+                shareIt();
+                break;
+            case R.id.button5:
+                if(book) {
+                    //mettre bookmark
+                    //Toast.makeText(getApplicationContext(), "on", Toast.LENGTH_SHORT).show();
+                    toggle.setBackgroundResource(R.drawable.ic_book_black_48dp);
+                    SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+                    SharedPreferences.Editor e = getSharedPreferences("bookmarks",MODE_PRIVATE).edit();
+                    //Toast.makeText(getApplicationContext(), link, Toast.LENGTH_SHORT).show();
+                    //if(prefs.getInt("bookmark_size", 0)!=0){}
+                    i=prefs.getInt("bookmark_size", 0);
+                    e.putInt("bookmark_size",i+1);
+
+                    String listCount = "url"+i;
+                    Toast.makeText(getApplicationContext(), listCount, Toast.LENGTH_SHORT).show();
+                    e.putString(listCount, link);
+                    e.commit();
+
+                    book = !book;
+                }
+                else{
+                    //retirer bookmark
+                    //Toast.makeText(getApplicationContext(), "off", Toast.LENGTH_SHORT).show();
+                    toggle.setBackgroundResource(R.drawable.ic_bookmark_border_white_48dp);
+                    book = !book;
+                }
+
+                break;
         }
+    }
+    private void shareIt() {
+
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, desc);
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, link);
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
     }
 
 
