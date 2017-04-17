@@ -251,9 +251,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_book) {
             Toast.makeText(getApplicationContext(), "bookmarks", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), BookmarkActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_settings) {
-            Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
+            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+            Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
