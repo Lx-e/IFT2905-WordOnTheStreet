@@ -29,7 +29,7 @@
             android:layout_alignBottom="@+id/image"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:background="#bc000000"
+            android:background="#A6000000"
             android:gravity="bottom"
             android:padding="10dp"
             android:text="Title"
@@ -43,7 +43,7 @@
             android:layout_alignBottom="@+id/image"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:background="#bc000000"
+            android:background="#A6000000"
             android:gravity="bottom"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
@@ -55,6 +55,21 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/hiddenDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="TextView"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/hiddenurl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="TextView"
+        android:visibility="invisible" />
 
 
 </RelativeLayout>
