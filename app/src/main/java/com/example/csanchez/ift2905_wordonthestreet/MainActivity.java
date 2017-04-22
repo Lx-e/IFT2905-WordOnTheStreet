@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent.putExtra("date", newsDate);
                 intent.putExtra("desc", desc);
                 intent.putExtra("link", link);
+                intent.putExtra("caller", "MainActivity");
                 startActivity(intent);
             }
         });
@@ -250,7 +251,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         } else if (id == R.id.nav_book) {
-            Toast.makeText(getApplicationContext(), "bookmarks", Toast.LENGTH_SHORT).show();
+            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+            int size = prefs.getInt("bookmark_size", 0);
+
+            Toast.makeText(getApplicationContext(), "bookmarks"+((Integer)size).toString(), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(), BookmarkActivity.class);
             startActivity(intent);
 
