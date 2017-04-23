@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -39,21 +40,57 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import android.widget.PopupMenu;
 
 
-public class BookmarkActivity extends AppCompatActivity{
+public class BookmarkActivity extends AppCompatActivity implements View.OnClickListener{
     ListView list;
     MyAdapter adapter;
-    int n = 30;
-    static int i= 0;
+    private String[] bookmarks;
+
+    Button reset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bookmarks);
 
+       SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+        int size = prefs.getInt("bookmark_size", 0);
+        String restored = "";
+        String link = "";
+        bookmarks = new String[size+1];
+        for(int i = 0; i<size+1; i++){
+            link = "title"+((Integer)i).toString();
+            restored = prefs.getString(link, null);
+            bookmarks[i] = restored;
+        }
+
+        reset = (Button)findViewById(R.id.button6);
+        reset.setOnClickListener(this);
         list = (ListView)findViewById(R.id.listviewb);
         adapter = new MyAdapter();
         list.setAdapter(adapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+
+
+                String link = prefs.getString("url"+((Integer)position).toString(), null);
+
+                String newsDate = prefs.getString("date"+((Integer)position).toString(), null);
+
+                String desc = prefs.getString("title"+((Integer)position).toString(), null);
+
+
+                Intent intent = new Intent(getApplicationContext(), SingleNewsExpand.class);
+
+                intent.putExtra("date", newsDate);
+                intent.putExtra("desc", desc);
+                intent.putExtra("link", link);
+                intent.putExtra("caller", "BookmarkActivity");
+                startActivity(intent);
+            }
+        });
     }
 
     public class MyAdapter extends BaseAdapter{
@@ -63,7 +100,9 @@ public class BookmarkActivity extends AppCompatActivity{
         }
         @Override
         public int getCount() {
-            return n;
+            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+            int size = prefs.getInt("bookmark_size", 0);
+            return size;
         }
 
         @Override
@@ -79,33 +118,21 @@ public class BookmarkActivity extends AppCompatActivity{
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = convertView;
-            String url="nothing";
-            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
-            /*for(i = 0;i<30;i++){
-                String restoreURL = "url"+i;
-                if(prefs.getString(restoreURL,null)==null){
-                    //ya pu de bookmarks
-                }
-                else
-                    url = prefs.getString(restoreURL, null);
-            }*/
-            String restoreURL = "url"+((Integer)(prefs.getInt("bookmark_size",0)-1)).toString();
-            String restoredText = prefs.getString(restoreURL, null);
 
-       //     if (restoredText != null) {
-       //         url = prefs.getString("url", "No url defined");
-
-         //   }
             if(v==null)
                 v = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
 
             TextView tv = (TextView)v.findViewById(android.R.id.text1);
-            tv.setText(restoredText);
+            tv.setText(bookmarks[position]);
 
             return v;
         }
     }
-
+    public void onClick(View v){
+        this.getSharedPreferences("bookmarks", 0).edit().clear().commit();
+        startActivity(new Intent(this, BookmarkActivity.class));
+        finish();
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();

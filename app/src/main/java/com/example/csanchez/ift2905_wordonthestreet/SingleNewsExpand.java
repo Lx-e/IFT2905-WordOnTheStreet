@@ -48,7 +48,7 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
 
     private TextView textviewDate;
     private TextView textviewDesc;
-    boolean book=false;
+    boolean bookmarked=false;
     Button inapp;
     Button brow;
     Button share;
@@ -57,12 +57,17 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
     String link;
     String date;
     String desc;
-    static int i;
+    String caller;
+    static int i, j;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.singlenewsexpand);
-
+        SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+        SharedPreferences prefsH = getSharedPreferences("history", MODE_PRIVATE);
+        SharedPreferences.Editor e = getSharedPreferences("bookmarks",MODE_PRIVATE).edit();
+        SharedPreferences.Editor ee = getSharedPreferences("history",MODE_PRIVATE).edit();
+        caller     = getIntent().getStringExtra("caller");
         textviewDate = (TextView)findViewById(R.id.textDate);
         textviewDesc = (TextView)findViewById(R.id.textDesc);
 
@@ -76,8 +81,7 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
         share.setOnClickListener(this);
         toggle.setOnClickListener(this);
 
-
-
+        int size = prefs.getInt("bookmark_size", 0);
 
         webview = (WebView)findViewById(R.id.webv);
         Intent i = getIntent();
@@ -88,9 +92,24 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
             desc = (String) b.get("desc");
             textviewDesc.setText(desc);
             link = (String) b.get("link");
+            j=prefsH.getInt("history_size", 0);
+            ee.putInt("history_size",j+1);
+            String listHistory = "H_url"+j;
+            String titleHistory = "H_title"+j;
+            String dateHistory = "H_date"+j;
+            ee.putString(listHistory, link);
+            ee.putString(titleHistory, desc);
+            ee.putString(dateHistory, date);
+            ee.commit();
         }
-
-
+        String urlbook;
+        for(int k=0;k<size+1;k++){
+            urlbook = prefs.getString("url"+((Integer)k).toString(), null);
+           if(link.equals(urlbook)){
+               toggle.setBackgroundResource(R.drawable.ic_book_black_48dp);
+               bookmarked = true;
+           }
+        }
 
     }
     @Override
@@ -108,9 +127,10 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
                 shareIt();
                 break;
             case R.id.button5:
-                if(book) {
+                if(!bookmarked) {
                     //mettre bookmark
                     //Toast.makeText(getApplicationContext(), "on", Toast.LENGTH_SHORT).show();
+
                     toggle.setBackgroundResource(R.drawable.ic_book_black_48dp);
                     SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
                     SharedPreferences.Editor e = getSharedPreferences("bookmarks",MODE_PRIVATE).edit();
@@ -120,17 +140,60 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
                     e.putInt("bookmark_size",i+1);
 
                     String listCount = "url"+i;
+                    String titleCount = "title"+i;
+                    String dateCount = "date"+i;
+
                     Toast.makeText(getApplicationContext(), listCount, Toast.LENGTH_SHORT).show();
                     e.putString(listCount, link);
+                    e.putString(titleCount, desc);
+                    e.putString(dateCount, date);
                     e.commit();
 
-                    book = !book;
+                    bookmarked = true;
                 }
                 else{
                     //retirer bookmark
                     //Toast.makeText(getApplicationContext(), "off", Toast.LENGTH_SHORT).show();
+                    String urlbook;
+                    int pivot=0;
+                    boolean sucessRemove=false;
+                    SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+                    SharedPreferences.Editor e = getSharedPreferences("bookmarks",MODE_PRIVATE).edit();
+                    int size = prefs.getInt("bookmark_size", 0);
+
+                    for(int k=0;k<size+1;k++){
+                        urlbook = prefs.getString("url"+((Integer)k).toString(), null);
+                        if(link.equals(urlbook)){
+                            pivot = k;
+                            e.remove("url"+((Integer)k).toString());
+                            e.remove("title"+((Integer)k).toString());
+                            e.remove("date"+((Integer)k).toString());
+                            e.apply();
+                            sucessRemove = true;
+                        }
+                    }
+                    if(sucessRemove) {
+                        for (int k = pivot; k < size ; k++){
+                            String listCount = "url"+k;
+                            String titleCount = "title"+k;
+                            String dateCount = "date"+k;
+
+                            String newLink = prefs.getString("url"+((Integer)(k+1)).toString(), null);
+                            String newDesc = prefs.getString("title"+((Integer)(k+1)).toString(), null);
+                            String newDate = prefs.getString("date"+((Integer)(k+1)).toString(), null);
+
+                            Toast.makeText(getApplicationContext(), listCount, Toast.LENGTH_SHORT).show();
+                            e.putString(listCount, newLink);
+                            e.putString(titleCount, newDesc);
+                            e.putString(dateCount, newDate);
+                            e.commit();
+                        }
+                        e.putInt("bookmark_size", size-1);
+                        e.apply();
+                    }
+
                     toggle.setBackgroundResource(R.drawable.ic_bookmark_border_white_48dp);
-                    book = !book;
+                    bookmarked = false;
                 }
 
                 break;
@@ -149,7 +212,13 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(this, MainActivity.class));
+        caller     = getIntent().getStringExtra("caller");
+        if(caller.equals("BookmarkActivity"))
+            startActivity(new Intent(this, BookmarkActivity.class));
+        else if(caller.equals("HistoryActivity"))
+            startActivity(new Intent(this, HistoryActivity.class));
+        else
+            startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 }
