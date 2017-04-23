@@ -47,7 +47,7 @@ public class BookmarkActivity extends AppCompatActivity implements View.OnClickL
     ListView list;
     MyAdapter adapter;
     private String[] bookmarks;
-    boolean nextEntry = false;
+
     Button reset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -23,6 +23,7 @@ package="com.example.csanchez.ift2905_wordonthestreet">
     </activity>
     <activity android:name=".SingleNewsExpand" />
     <activity android:name=".BookmarkActivity" />
+    <activity android:name=".HistoryActivity" />
 </application>
 
 </manifest>
