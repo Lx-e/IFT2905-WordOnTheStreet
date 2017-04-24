@@ -58,12 +58,15 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
     String date;
     String desc;
     String caller;
-    static int i;
+    static int i, j;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.singlenewsexpand);
         SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+        SharedPreferences prefsH = getSharedPreferences("history", MODE_PRIVATE);
+        SharedPreferences.Editor e = getSharedPreferences("bookmarks",MODE_PRIVATE).edit();
+        SharedPreferences.Editor ee = getSharedPreferences("history",MODE_PRIVATE).edit();
         caller     = getIntent().getStringExtra("caller");
         textviewDate = (TextView)findViewById(R.id.textDate);
         textviewDesc = (TextView)findViewById(R.id.textDesc);
@@ -78,8 +81,6 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
         share.setOnClickListener(this);
         toggle.setOnClickListener(this);
 
-
-
         int size = prefs.getInt("bookmark_size", 0);
 
         webview = (WebView)findViewById(R.id.webv);
@@ -91,17 +92,24 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
             desc = (String) b.get("desc");
             textviewDesc.setText(desc);
             link = (String) b.get("link");
+            j=prefsH.getInt("history_size", 0);
+            ee.putInt("history_size",j+1);
+            String listHistory = "H_url"+j;
+            String titleHistory = "H_title"+j;
+            String dateHistory = "H_date"+j;
+            ee.putString(listHistory, link);
+            ee.putString(titleHistory, desc);
+            ee.putString(dateHistory, date);
+            ee.commit();
         }
         String urlbook;
         for(int k=0;k<size+1;k++){
             urlbook = prefs.getString("url"+((Integer)k).toString(), null);
            if(link.equals(urlbook)){
                toggle.setBackgroundResource(R.drawable.ic_book_black_48dp);
-
                bookmarked = true;
            }
         }
-
 
     }
     @Override
@@ -207,6 +215,8 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
         caller     = getIntent().getStringExtra("caller");
         if(caller.equals("BookmarkActivity"))
             startActivity(new Intent(this, BookmarkActivity.class));
+        else if(caller.equals("HistoryActivity"))
+            startActivity(new Intent(this, HistoryActivity.class));
         else
             startActivity(new Intent(this, MainActivity.class));
         finish();
