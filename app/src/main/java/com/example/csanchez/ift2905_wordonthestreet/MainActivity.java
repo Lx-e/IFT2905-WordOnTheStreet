@@ -248,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_history) {
             Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
+            startActivity(intent);
 
 
         } else if (id == R.id.nav_book) {
