@@ -1,6 +1,5 @@
 package com.example.csanchez.ift2905_wordonthestreet;
 
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -9,12 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
+
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -27,12 +28,15 @@ import java.util.Map;
 
 
 public class SourceActivity extends AppCompatActivity implements View.OnClickListener{
-    ListView list;
+
+    String categoryName = null;
+    ListView list = null;
 
     List<Source> allSources = new ArrayList<Source>();
     List<Source> favoriteSources = new ArrayList<Source>();
+    List<Source> categorySources = new ArrayList<Source>();
 
-    Map<String, Source> sourcesByName = new HashMap<String, Source>();
+    Map<String, Source> namesToSources = new HashMap<String, Source>();
     Map<View, Source> viewsToSources = new HashMap<View, Source>();
 
     @Override
@@ -40,28 +44,19 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sources);
 
-        //categories = getIntent().getExtras().getStringArray("categories");
+        categoryName = getIntent().getStringExtra("Category");
 
-        list = (ListView) findViewById(R.id.listView_news);
+        list = (ListView) findViewById(R.id.listView_sources);
+        ((Toolbar)findViewById(R.id.toolbar3)).setTitle("Selects sources for " + categoryName);
 
         SourceActivity.SourceFetcher sourcesFetcher = new SourceActivity.SourceFetcher();
         sourcesFetcher.execute();
-        try {
-            Source[] sourceObjects = sourcesFetcher.get();
-            int g = 0;
-
-        }
-        catch (Throwable t) {
-            int h = 9;
-        }
     }
 
     protected void loadFavoriteSources() {
 
-        favoriteSources = new ArrayList<Source>();
-
-        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("CustomSources", "Nothing");//"No name defined" is the default value.
-        Log.v("TAG", "RETRIEVED: "+sourcesStr);
+        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
+        Log.v("TAG", "RETRIEVED FAVORITE SOURCES: "+sourcesStr);
 
         if(sourcesStr == null || sourcesStr.equals("Nothing")) return;
 
@@ -70,10 +65,11 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         for (String sourceName: sourceNames) {
             sourceName = sourceName.trim();
             Log.v("TAG", "Parsed: " + sourceName);
-            if (sourceName.length() > 0 && sourcesByName.containsKey(sourceName) && !favoriteSources.contains(sourceName))
-                favoriteSources.add(sourcesByName.get(sourceName));
+            if (sourceName.length() > 0 && namesToSources.containsKey(sourceName)) {
+                Source source =  namesToSources.get(sourceName);
+                if (!favoriteSources.contains(source)) favoriteSources.add(source);
+            }
         }
-
     }
 
     protected void saveFavoriteSources() {
@@ -85,10 +81,10 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
             for (Source source: favoriteSources) { sourcesBuffer.append(source.name.trim()).append(","); }
 
         SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
-        editor.remove("CustomSources");
-        editor.putString("CustomSources", sourcesBuffer.toString());
+        editor.remove("FavoriteSources");
+        editor.putString("FavoriteSources", sourcesBuffer.toString());
         editor.commit();
-        Log.v("TAG", "SAVING: "+ sourcesBuffer.toString());
+        Log.v("TAG", "SAVING FAVORITE SOURCES: "+ sourcesBuffer.toString());
     }
 
     //Inspiré de http://stackoverflow.com/questions/14509552/uncheck-all-checbox-in-listview-in-android
@@ -105,8 +101,22 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this, MainActivity.class));
+//        super.onBackPressed();
+        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
+        int resultCount = 0;
+        if(sourcesStr != null && !sourcesStr.equals("Nothing")) {
+            String[] sourceNames = sourcesStr.split(",");
+            for (String sourceName: sourceNames) {
+                Source source =  namesToSources.get(sourceName.trim());
+                if (source.category.equals(categoryName)) resultCount++;
+            }
+        }
+
+
+        Intent intent = new Intent();
+        intent.putExtra("CategoryName", categoryName);
+        intent.putExtra("FavoriteCount", resultCount);
+        setResult(RESULT_OK, intent);
         finish();
     }
 
@@ -118,11 +128,11 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
         if (favoriteSources.contains(source)) {
             favoriteSources.remove(source);
-            Log.v("TAG", "Favorite removed: " + new Gson().toJson(source));
+            Log.v("TAG", "Favorite source removed: " + new Gson().toJson(source));
         }
         else {
             favoriteSources.add(source);
-            Log.v("TAG", "Favorite added: " + new Gson().toJson(source));
+            Log.v("TAG", "Favorite source added: " + new Gson().toJson(source));
         }
 
         CheckBox cb = (v instanceof CheckBox) ? null : (CheckBox)v.findViewById(R.id.checkbox);
@@ -147,14 +157,13 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                 e.printStackTrace();
             }
 
-
             for (Source source: sources) {
                 allSources.add(source);
-                sourcesByName.put(source.name, source);
+                namesToSources.put(source.name, source);
+                if (source.category.equals(categoryName)) categorySources.add(source);
             }
 
             loadFavoriteSources();
-
 
             return sources;
         }
@@ -162,12 +171,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         protected void onPostExecute(final Source[] sources) {
 
-
-
-            Button saveBtn = (Button) findViewById(R.id.save_button);
-            Button clearBtn = (Button) findViewById(R.id.clear_custom);
-
-            clearBtn.setOnClickListener(new View.OnClickListener() {
+            ((Button)findViewById(R.id.clear_custom)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     clearCheckboxes(list);
@@ -176,7 +180,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                 }
             });
 
-            saveBtn.setOnClickListener(new View.OnClickListener() {
+            ((Button)findViewById(R.id.save_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     saveFavoriteSources();
@@ -186,7 +190,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
             list.setAdapter(new BaseAdapter() {
                 @Override
                 public int getCount() {
-                    return allSources.size();
+                    return categorySources.size();
                 }
 
                 @Override
@@ -202,26 +206,26 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
 
+                    Source source = categorySources.get(position);
+
                     if(convertView == null)
                         convertView = getLayoutInflater().inflate(R.layout.single_source, parent, false);
 
-                    TextView title = (TextView) convertView.findViewById(R.id.name);
-                    TextView category = (TextView) convertView.findViewById(R.id.category);
-                    CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox);
+                    TextView nameView = (TextView) convertView.findViewById(R.id.name);
+                    TextView countView = (TextView) convertView.findViewById(R.id.count);
+                    CheckBox checkBoxView = (CheckBox) convertView.findViewById(R.id.checkbox);
+                    ImageButton buttonView = (ImageButton) convertView.findViewById(R.id.config);
 
-                    Source source = allSources.get(position);
-                    title.setText(source.name);
-                    category.setText(source.category);
-                    checkBox.setChecked(favoriteSources.contains(source));
+                    nameView.setText(source.name);
+                    countView.setText("");
+                    buttonView.setImageAlpha(0);
+                    checkBoxView.setChecked(favoriteSources.contains(source));
 
                     convertView.setOnClickListener(SourceActivity.this);
-                    checkBox.setOnClickListener(SourceActivity.this);
+                    checkBoxView.setOnClickListener(SourceActivity.this);
 
                     viewsToSources.put(convertView, source);
-                    viewsToSources.put(checkBox, source);
-
-                    Log.e("TAG", "cvid: " + convertView.hashCode());
-                    Log.e("TAG", "cbid: " + checkBox.hashCode());
+                    viewsToSources.put(checkBoxView, source);
 
                     return convertView;
                 }

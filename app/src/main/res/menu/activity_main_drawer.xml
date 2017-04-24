@@ -8,10 +8,6 @@
             android:icon="@drawable/ic_favorite_border_black_48dp"
             android:title="Favorites" />
         <item
-            android:id="@+id/nav_tags"
-            android:icon="@drawable/ic_label_outline_black_48dp"
-            android:title="Tags" />
-        <item
             android:id="@+id/nav_history"
             android:icon="@drawable/ic_history_black_48dp"
             android:title="History" />

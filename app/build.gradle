@@ -35,5 +35,6 @@ dependencies {
     compile 'com.squareup.moshi:moshi:1.4.0'
     compile 'com.squareup.okhttp3:okhttp-urlconnection:3.6.0'
     compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
 }
