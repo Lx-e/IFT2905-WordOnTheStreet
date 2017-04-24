@@ -1,4 +1,7 @@
 package com.example.csanchez.ift2905_wordonthestreet;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,10 +47,23 @@ import java.util.Arrays;
 
 import java.util.HashMap;
 
+
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.app.Activity;
+import android.os.SystemClock;
+import android.view.Menu;
+import android.view.MenuItem;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     ListView list;
     private String[] srcArr;
+    int notId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         news.execute();
 
         changeTypeface(navigationView);
+
 
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -270,6 +289,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+/*
+    public void onSendNotificationsButtonClick(View view) {
+        NotificationEventReceiver.setupAlarm(getApplicationContext());
+    }*/
+
+
 
     private void applyFontToItem(MenuItem item, Typeface font) {
         SpannableString mNewTitle = new SpannableString(item.getTitle());
