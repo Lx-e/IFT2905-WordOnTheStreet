@@ -92,15 +92,17 @@ public class SingleNewsExpand extends AppCompatActivity implements View.OnClickL
             desc = (String) b.get("desc");
             textviewDesc.setText(desc);
             link = (String) b.get("link");
-            j=prefsH.getInt("history_size", 0);
-            ee.putInt("history_size",j+1);
-            String listHistory = "H_url"+j;
-            String titleHistory = "H_title"+j;
-            String dateHistory = "H_date"+j;
-            ee.putString(listHistory, link);
-            ee.putString(titleHistory, desc);
-            ee.putString(dateHistory, date);
-            ee.commit();
+            if(!(caller.equals("HistoryActivity")||caller.equals("BookmarkActivity"))){
+                j=prefsH.getInt("history_size", 0);
+                ee.putInt("history_size",j+1);
+                String listHistory = "H_url"+j;
+                String titleHistory = "H_title"+j;
+                String dateHistory = "H_date"+j;
+                ee.putString(listHistory, link);
+                ee.putString(titleHistory, desc);
+                ee.putString(dateHistory, date);
+                ee.commit();
+            }
         }
         String urlbook;
         for(int k=0;k<size+1;k++){
