@@ -13,39 +13,48 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="169dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/image"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/image"
             android:layout_marginRight="0dp"
-            android:layout_weight="3"
             android:background="#bc000000"
             android:minHeight="10dp"
             android:padding="10dp"
-            android:text="Title"
+            android:text="Name"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="#f0f0f0" />
 
         <TextView
-            android:id="@+id/category"
-            android:layout_width="90dp"
+            android:id="@+id/count"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="0dp"
             android:background="#bc000000"
             android:gravity="center_vertical"
-            android:text="Categorie"
+            android:text="(x/y)"
             android:textAlignment="center"
-            android:textColor="#f0f0f0" />
+            android:textColor="#f0f0f0"
+            android:layout_weight="0.58" />
+
+        <ImageButton
+            android:id="@+id/config"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:background="#bc000000"
+            app:srcCompat="@drawable/ic_settings_24dp" />
 
         <CheckBox
             android:id="@+id/checkbox"
-            android:layout_width="30dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="#bc000000"
             android:focusable="false"
