@@ -51,14 +51,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        toolbar.getMenu().clear();
         toolbar.setBackground(new ColorDrawable(0x000000FF));
-        getSupportActionBar().setTitle("");
-        getSupportActionBar().setSubtitle("");
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0x000000FF));
-        getSupportActionBar().setLogo(getDrawable(R.drawable.wots));
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
+        toolbar.setLogo(getDrawable(R.drawable.wots2));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -107,10 +108,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             try {
                 SharedPreferences prefs = getSharedPreferences("SavedData", MODE_PRIVATE);
-                String sourcesStr = prefs.getString("CustomSources", "Nothing");//"No name defined" is the default value.
+                String sourcesStr = prefs.getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
                 Log.v("TAG", "RETRIEVED: "+sourcesStr);
 
-                sourcesStr = "Nothing";
                 if(sourcesStr.equals("Nothing")){
                     Log.v("TAG", "Really got : "+sourcesStr);
                     try{
