@@ -2,8 +2,12 @@ package com.example.csanchez.ift2905_wordonthestreet;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class SourceActivity extends AppCompatActivity implements View.OnClickListener{
+public class SourceActivity extends AppCompatActivity implements View.OnClickListener {
 
     String categoryName = null;
     ListView list = null;
@@ -37,6 +41,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
     List<Source> categorySources = new ArrayList<Source>();
 
     Map<String, Source> namesToSources = new HashMap<String, Source>();
+    Map<String, Source> idsToSources = new HashMap<String, Source>();
     Map<View, Source> viewsToSources = new HashMap<View, Source>();
 
     @Override
@@ -47,7 +52,23 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         categoryName = getIntent().getStringExtra("Category");
 
         list = (ListView) findViewById(R.id.listView_sources);
-        ((Toolbar)findViewById(R.id.toolbar3)).setTitle("Selects sources for " + categoryName);
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.getMenu().clear();
+        toolbar.setBackground(new ColorDrawable(0x000000FF));
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
+        toolbar.setLogo(getDrawable(R.drawable.wots2));
+
+//        ((Toolbar)findViewById(R.id.toolbar)).setTitle("Selects sources for " + categoryName);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
         SourceActivity.SourceFetcher sourcesFetcher = new SourceActivity.SourceFetcher();
         sourcesFetcher.execute();
@@ -60,13 +81,13 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
         if(sourcesStr == null || sourcesStr.equals("Nothing")) return;
 
-        String[] sourceNames = sourcesStr.split(",");
+        String[] sourceIds = sourcesStr.split(",");
 
-        for (String sourceName: sourceNames) {
-            sourceName = sourceName.trim();
-            Log.v("TAG", "Parsed: " + sourceName);
-            if (sourceName.length() > 0 && namesToSources.containsKey(sourceName)) {
-                Source source =  namesToSources.get(sourceName);
+        for (String sourceIdStr: sourceIds) {
+            sourceIdStr = sourceIdStr.trim();
+            Log.v("TAG", "Parsed: " + sourceIdStr);
+            if (sourceIdStr.length() > 0 && idsToSources.containsKey(sourceIdStr)) {
+                Source source =  idsToSources.get(sourceIdStr);
                 if (!favoriteSources.contains(source)) favoriteSources.add(source);
             }
         }
@@ -78,7 +99,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         if (favoriteSources.size() == 0)
             sourcesBuffer.append("Nothing");
         else
-            for (Source source: favoriteSources) { sourcesBuffer.append(source.name.trim()).append(","); }
+            for (Source source: favoriteSources) { sourcesBuffer.append(source.id).append(","); }
 
         SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
         editor.remove("FavoriteSources");
@@ -107,7 +128,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         if(sourcesStr != null && !sourcesStr.equals("Nothing")) {
             String[] sourceNames = sourcesStr.split(",");
             for (String sourceName: sourceNames) {
-                Source source =  namesToSources.get(sourceName.trim());
+                Source source =  idsToSources.get(sourceName.trim());
                 if (source.category.equals(categoryName)) resultCount++;
             }
         }
@@ -159,6 +180,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
             for (Source source: sources) {
                 allSources.add(source);
+                idsToSources.put(source.id, source);
                 namesToSources.put(source.name, source);
                 if (source.category.equals(categoryName)) categorySources.add(source);
             }
@@ -214,11 +236,10 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                     TextView nameView = (TextView) convertView.findViewById(R.id.name);
                     TextView countView = (TextView) convertView.findViewById(R.id.count);
                     CheckBox checkBoxView = (CheckBox) convertView.findViewById(R.id.checkbox);
-                    ImageButton buttonView = (ImageButton) convertView.findViewById(R.id.config);
 
-                    nameView.setText(source.name);
+                    countView.setVisibility(View.INVISIBLE);
                     countView.setText("");
-                    buttonView.setImageAlpha(0);
+                    nameView.setText(source.name);
                     checkBoxView.setChecked(favoriteSources.contains(source));
 
                     convertView.setOnClickListener(SourceActivity.this);

@@ -2,11 +2,22 @@ package com.example.csanchez.ift2905_wordonthestreet;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -15,6 +26,7 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import org.json.JSONException;
@@ -25,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryActivity extends AppCompatActivity implements View.OnClickListener{
+public class CategoryActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
 
     ListView list;
 
@@ -36,6 +48,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     List<Source> favoriteSources = new ArrayList<Source>();
 
     Map<String, Source> namesToSources = new HashMap<String, Source>();
+    Map<String, Source> idsToSources = new HashMap<String, Source>();
 
     Map<String, Integer> categoryToSourceCount = new HashMap<String, Integer>();
     Map<String, Integer> categoryToFavoriteSourceCount = new HashMap<String, Integer>();
@@ -48,7 +61,24 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
 
-        ((Toolbar)findViewById(R.id.toolbar2)).setTitle("Select favorite categories");
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.getMenu().clear();
+        toolbar.setBackground(new ColorDrawable(0x000000FF));
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
+        toolbar.setLogo(getDrawable(R.drawable.wots2));
+
+//        toolbar.setTitle("Select favorite categories");
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        setSupportActionBar(toolbar);
+
 
         list = (ListView) findViewById(R.id.listView_categories);
 
@@ -63,30 +93,29 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         String categoriesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteCategories", "Nothing");//"No name defined" is the default value.
         Log.v("TAG", "RETRIEVED FAVORITE CATEGORIES: "+categoriesStr);
 
-        if(categoriesStr == null || categoriesStr.equals("Nothing")) return;
+        if(categoriesStr != null && !categoriesStr.equals("Nothing")) {
+            String[] categoryNames = categoriesStr.split(",");
 
-        String[] categoryNames = categoriesStr.split(",");
-
-        for (String categoryName: categoryNames) {
-            categoryName = categoryName.trim();
-            Log.v("TAG", "Parsed: " + categoryName);
-            if (categoryName.length() > 0 && allCategories.contains(categoryName) && !favoriteCategories.contains(categoryName))
-                favoriteCategories.add(categoryName);
+            for (String categoryName: categoryNames) {
+                categoryName = categoryName.trim();
+                Log.v("TAG", "Parsed: " + categoryName);
+                if (categoryName.length() > 0 && allCategories.contains(categoryName) && !favoriteCategories.contains(categoryName))
+                    favoriteCategories.add(categoryName);
+            }
         }
-
 
         String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
         Log.v("TAG", "RETRIEVED FAVORITE SOURCES: "+sourcesStr);
 
         if(sourcesStr == null || sourcesStr.equals("Nothing")) return;
 
-        String[] sourceNames = sourcesStr.split(",");
+        String[] sourceIds = sourcesStr.split(",");
 
-        for (String sourceName: sourceNames) {
-            sourceName = sourceName.trim();
-            Log.v("TAG", "Parsed: " + sourceName);
-            if (sourceName.length() > 0 && namesToSources.containsKey(sourceName)) {
-                Source source =  namesToSources.get(sourceName);
+        for (String sourceId: sourceIds) {
+            sourceId = sourceId.trim();
+            Log.v("TAG", "Parsed: " + sourceId);
+            if (sourceId.length() > 0 && idsToSources.containsKey(sourceId)) {
+                Source source =  idsToSources.get(sourceId);
                 if (!favoriteSources.contains(source)) {
                     favoriteSources.add(source);
                     int count = categoryToFavoriteSourceCount.containsKey(source.category) ?
@@ -95,8 +124,6 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         }
-
-
     }
 
     protected void saveFavoriteCategories() {
@@ -129,6 +156,14 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+
         finish();
     }
 
@@ -141,38 +176,123 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                 int sourceCount = categoryToSourceCount.containsKey(categoryName) ?
                         categoryToSourceCount.get(categoryName) : 0;
                 categoryToFavoriteSourceCount.put(categoryName, favoriteCount);
-                countViewsByCategories.get(categoryName).setText("(" + favoriteCount + "/" + sourceCount + ")");
+                countViewsByCategories.get(categoryName).setText((CharSequence)("(" + favoriteCount + "/" + sourceCount + ")"));
+//                countViewsByCategories.get(categoryName).invalidate();
+//                countViewsByCategories.get(categoryName).postInvalidate();
+
+//                final TextView updatedView = countViewsByCategories.get(categoryName);
+//                final String newText = "(" + favoriteCount + "/" + sourceCount + ")";
+//                ListView items = ((ListView)findViewById(R.id.listView_categories));
+//                for (int i = 0; i < items.getChildCount(); i++) {
+//                    ViewGroup child = (ViewGroup)items.getChildAt(i);
+//                    TextView tv = (TextView)((ViewGroup)((ViewGroup)items.getChildAt(0)).getChildAt(0)).getChildAt(0);
+//                    if (categoryName.equals(tv.getText())) {
+//                        TextView tv2 = (TextView)((ViewGroup)((ViewGroup)items.getChildAt(0)).getChildAt(0)).getChildAt(1);
+//                        tv2.setText(newText);
+//                        break;
+//                    }
+//
+//                }
+
+
+//                Runnable updateTextView = new Runnable() { public void run() {updatedView.setText(newText);}};
+//                runOnUiThread(updateTextView);
+
             }
+
+
         }
     }
+
+
 
     @Override
     public void onClick(View v) {
 
         String categoryName = viewsToCategories.get(v);
 
-        if (v instanceof ImageButton) {
-            // Click was on the source config button
-            Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
-            intent.putExtra("Category", categoryName.toString());
-            startActivityForResult(intent, 0);
-            return;
-        }
+        Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
+        intent.putExtra("Category", categoryName.toString());
+        startActivityForResult(intent, 0);
+        return;
 
-        // Click was on the category item or its checkbox
-        if (favoriteCategories.contains(categoryName)) {
-            favoriteCategories.remove(categoryName);
-            Log.v("TAG", "Favorite category disabled: " + categoryName);
-        }
-        else {
-            favoriteCategories.add(categoryName);
-            Log.v("TAG", "Favorite category enabled: " + categoryName);
-        }
-
-        CheckBox cb = (v instanceof CheckBox) ? null : (CheckBox)v.findViewById(R.id.checkbox);
-        if (cb != null) cb.setChecked(!cb.isChecked());
+//        if (v instanceof ImageButton) {
+//            // Click was on the source config button
+//            Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
+//            intent.putExtra("Category", categoryName.toString());
+//            startActivityForResult(intent, 0);
+//            return;
+//        }
+//
+//        // Click was on the category item or its checkbox
+//        if (favoriteCategories.contains(categoryName)) {
+//            favoriteCategories.remove(categoryName);
+//            Log.v("TAG", "Favorite category disabled: " + categoryName);
+//
+//        }
+//        else {
+//            favoriteCategories.add(categoryName);
+//            Log.v("TAG", "Favorite category enabled: " + categoryName);
+//        }
+//
+//        CheckBox cb = (v instanceof CheckBox) ? null : (CheckBox)v.findViewById(R.id.checkbox);
+//        if (cb != null) cb.setChecked(!cb.isChecked());
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId())
+//        {
+//            case android.R.id.home:
+//                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+//                drawer.openDrawer(GravityCompat.START);
+//                return true;
+//        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_fav) {
+            Toast.makeText(getApplicationContext(), "favorites", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getApplicationContext(), CategoryActivity.class));
+        }
+        else if (id == R.id.nav_history) {
+            Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getApplicationContext(), HistoryActivity.class));
+        }
+        else if (id == R.id.nav_book) {
+            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+            int size = prefs.getInt("bookmark_size", 0);
+
+            Toast.makeText(getApplicationContext(), "bookmarks"+((Integer)size).toString(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), BookmarkActivity.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.nav_settings) {
+            //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
+            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+            Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), ScreenSlidePagerActivity.class);
+            startActivity(intent);
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 
     public class CategoriesFetcher extends AsyncTask<Object, Object, Source[]> {
 
@@ -194,6 +314,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
             for (Source source: sources) {
                 if (!allSources.contains(source)) allSources.add(source); else continue;
                 namesToSources.put(source.name, source);
+                idsToSources.put(source.id, source);
                 if (!allCategories.contains(source.category)) allCategories.add(source.category);
                 int count = categoryToSourceCount.containsKey(source.category) ?
                         categoryToSourceCount.get(source.category) : 0;
@@ -249,7 +370,8 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                     TextView nameView    = (TextView) convertView.findViewById(R.id.name);
                     TextView countView = (TextView) convertView.findViewById(R.id.count);
                     CheckBox checkBoxView = (CheckBox) convertView.findViewById(R.id.checkbox);
-                    ImageButton buttonView = (ImageButton) convertView.findViewById(R.id.config);
+
+                    checkBoxView.setVisibility(View.INVISIBLE);
 
                     String categoryName = allCategories.get(position);
                     int favoriteCount = categoryToFavoriteSourceCount.containsKey(categoryName) ?
@@ -263,12 +385,10 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
                     convertView.setOnClickListener(CategoryActivity.this);
                     checkBoxView.setOnClickListener(CategoryActivity.this);
-                    buttonView.setOnClickListener(CategoryActivity.this);
 
                     countViewsByCategories.put(categoryName, countView);
                     viewsToCategories.put(convertView, categoryName);
                     viewsToCategories.put(checkBoxView, categoryName);
-                    viewsToCategories.put(buttonView, categoryName);
 
                     return convertView;
                 }
