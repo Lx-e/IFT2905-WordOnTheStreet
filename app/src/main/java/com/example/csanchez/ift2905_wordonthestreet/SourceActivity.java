@@ -2,29 +2,23 @@ package com.example.csanchez.ift2905_wordonthestreet;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -37,20 +31,18 @@ import java.util.List;
 import java.util.Map;
 
 
-public class SourceActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class SourceActivity extends AppCompatActivity implements View.OnClickListener {
 
     String categoryName = null;
     ListView list = null;
 
     List<Source> allSources = new ArrayList<Source>();
     List<Source> favoriteSources = new ArrayList<Source>();
-    List<Source> initialFavoriteSources = new ArrayList<Source>();
     List<Source> categorySources = new ArrayList<Source>();
 
     Map<String, Source> namesToSources = new HashMap<String, Source>();
     Map<String, Source> idsToSources = new HashMap<String, Source>();
     Map<View, Source> viewsToSources = new HashMap<View, Source>();
-    Map<Source, CheckBox> sourcesToCheckboxes = new HashMap<Source, CheckBox>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +54,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         list = (ListView) findViewById(R.id.listView_sources);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         toolbar.getMenu().clear();
         toolbar.setBackground(new ColorDrawable(0x000000FF));
         toolbar.setTitle("");
@@ -69,23 +62,14 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
         toolbar.setLogo(getDrawable(R.drawable.wots2));
 
+//        ((Toolbar)findViewById(R.id.toolbar)).setTitle("Selects sources for " + categoryName);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
-        navigationView.setNavigationItemSelectedListener(this);
-        changeTypeface(navigationView);
-
-        navigationView.getMenu().findItem(R.id.nav_fav).setEnabled(false);
-
-        ((TextView)findViewById(R.id.select_source_instr)).setText("Select " + categoryName + " sources");
         SourceActivity.SourceFetcher sourcesFetcher = new SourceActivity.SourceFetcher();
         sourcesFetcher.execute();
     }
@@ -125,55 +109,15 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     //Inspiré de http://stackoverflow.com/questions/14509552/uncheck-all-checbox-in-listview-in-android
-    private void unselectAll(ViewGroup vg) {
+    private void clearCheckboxes(ViewGroup vg) {
         for (int i = 0; i < vg.getChildCount(); i++) {
             View v = vg.getChildAt(i);
             if (v instanceof CheckBox) {
-                CheckBox cb = (CheckBox)v;
-                if (cb.isChecked()) {
-                    cb.setChecked(false);
-                }
+                ((CheckBox) v).setChecked(false);
             } else if (v instanceof ViewGroup) {
-                unselectAll((ViewGroup) v);
+                clearCheckboxes((ViewGroup) v);
             }
         }
-        for (Source s: categorySources) {
-            if (favoriteSources.contains(s)) {
-                favoriteSources.remove(s);
-            }
-        }
-    }
-
-    //Inspiré de http://stackoverflow.com/questions/14509552/uncheck-all-checbox-in-listview-in-android
-    private void selectAll(ViewGroup vg) {
-        for (int i = 0; i < vg.getChildCount(); i++) {
-            View v = vg.getChildAt(i);
-            if (v instanceof CheckBox) {
-                CheckBox cb = (CheckBox)v;
-                if (!cb.isChecked()) {
-                    cb.setChecked(true);
-                }
-            } else if (v instanceof ViewGroup) {
-                selectAll((ViewGroup) v);
-            }
-        }
-        for (Source s: categorySources) {
-            if (!favoriteSources.contains(s)) {
-                favoriteSources.add(s);
-            }
-        }
-    }
-
-    private void revertAll(ViewGroup vg) {
-        unselectAll(vg);
-        for (Source s: initialFavoriteSources) {
-            if (!categoryName.equals(s.category)) continue;
-            CheckBox cb = sourcesToCheckboxes.get(s);
-            cb.setChecked(true);
-        }
-        favoriteSources.clear();
-        favoriteSources.addAll(initialFavoriteSources);
-        saveFavoriteSources();
     }
 
     @Override
@@ -199,88 +143,6 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
-                drawer.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_fav) {
-            Toast.makeText(getApplicationContext(), "favorites", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), CategoryActivity.class));
-        }
-        else if (id == R.id.nav_history) {
-            Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), HistoryActivity.class));
-        }
-        else if (id == R.id.nav_book) {
-            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
-            int size = prefs.getInt("bookmark_size", 0);
-
-            Toast.makeText(getApplicationContext(), "bookmarks"+((Integer)size).toString(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getApplicationContext(), BookmarkActivity.class);
-            startActivity(intent);
-        }
-        else if (id == R.id.nav_settings) {
-            //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
-            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
-            Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getApplicationContext(), ScreenSlidePagerActivity.class);
-            startActivity(intent);
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        finish();
-        return true;
-    }
-
-
-    private void applyFontToItem(MenuItem item, Typeface font) {
-        SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", font, 30), 0 ,
-                mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        item.setTitle(mNewTitle);
-    }
-
-    private void changeTypeface(NavigationView navigationView){
-        FontTypeface fontTypeface = new FontTypeface(this);
-        Typeface typeface = fontTypeface.getTypefaceAndroid();
-
-        MenuItem item;
-
-        item = navigationView.getMenu().findItem(R.id.nav_book);
-        item.setTitle("Bookmarks");
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_fav);
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_history);
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_settings);
-        applyFontToItem(item, typeface);
-    }
-
-    @Override
     public void onClick(View v) {
 
         Source source = viewsToSources.get(v);
@@ -288,12 +150,10 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
         if (favoriteSources.contains(source)) {
             favoriteSources.remove(source);
-            saveFavoriteSources();
             Log.v("TAG", "Favorite source removed: " + new Gson().toJson(source));
         }
         else {
             favoriteSources.add(source);
-            saveFavoriteSources();
             Log.v("TAG", "Favorite source added: " + new Gson().toJson(source));
         }
 
@@ -327,7 +187,6 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             loadFavoriteSources();
-            initialFavoriteSources.addAll(favoriteSources);
 
             return sources;
         }
@@ -335,26 +194,18 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         protected void onPostExecute(final Source[] sources) {
 
-            ((ImageButton)findViewById(R.id.uncheck_all_button)).setOnClickListener(new View.OnClickListener() {
+            ((Button)findViewById(R.id.clear_custom)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    unselectAll(list);
+                    clearCheckboxes(list);
+                    favoriteSources.clear();
                     saveFavoriteSources();
                 }
             });
 
-            ((ImageButton)findViewById(R.id.check_all_button)).setOnClickListener(new View.OnClickListener() {
+            ((Button)findViewById(R.id.save_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    selectAll(list);
-                    saveFavoriteSources();
-                }
-            });
-
-            ((ImageButton)findViewById(R.id.revert_button)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    revertAll(list);
                     saveFavoriteSources();
                 }
             });
@@ -397,7 +248,6 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
                     viewsToSources.put(convertView, source);
                     viewsToSources.put(checkBoxView, source);
-                    sourcesToCheckboxes.put(source, checkBoxView);
 
                     return convertView;
                 }
