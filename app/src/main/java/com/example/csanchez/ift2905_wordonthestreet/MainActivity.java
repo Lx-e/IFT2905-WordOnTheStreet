@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_fav) {
             Toast.makeText(getApplicationContext(), "favorites", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), CategoryActivityCarlos.class));
+            startActivity(new Intent(getApplicationContext(), CategoryActivity.class));
         }
         else if (id == R.id.nav_history) {
             Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
