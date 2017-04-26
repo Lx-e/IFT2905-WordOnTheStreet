@@ -6,19 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.csanchez.ift2905_wordonthestreet.MainActivity">
+    tools:context="com.example.csanchez.ift2905_wordonthestreet.SourceActivity">
 
-    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.example.csanchez.ift2905_wordonthestreet.SourceActivity">
+        android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:theme="@style/AppTheme.AppBarOverlay">
 
             <android.support.v7.widget.Toolbar
@@ -30,25 +30,32 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <TextView
+            android:id="@+id/select_source_instr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/app_bar_layout"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:background="#bc000000"
+            android:textColor="#ffffffff"
+            android:textSize="20dp"
+            android:textAlignment="center"
+            android:text="Select Sources"/>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical" android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="1">
-
-            <!--<android.support.v7.widget.Toolbar-->
-                <!--android:id="@+id/toolbar3"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:background="?attr/colorPrimary"-->
-                <!--android:minHeight="?attr/actionBarSize"-->
-                <!--android:theme="?attr/actionBarTheme" />-->
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/select_source_instr"
+            android:layout_alignParentBottom="true">
 
             <ListView
                 android:id="@+id/listView_sources"
                 android:layout_width="match_parent"
                 android:layout_weight="1"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -56,25 +63,46 @@
                 android:orientation="horizontal"
                 android:layout_gravity="bottom">
 
-                <Button
-                    android:id="@+id/save_button"
-                    android:layout_width="match_parent"
+                <ImageButton
+                    android:id="@+id/uncheck_all_button"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="SAVE"/>
+                    android:layout_weight="0.5"
+                    android:background="#ffffffff"
+                    android:layout_marginLeft="15dp"
+                    app:srcCompat="@drawable/ic_uncheck_all"/>
 
-                <Button
-                    android:id="@+id/clear_custom"
-                    android:layout_width="match_parent"
+                <ImageButton
+                    android:id="@+id/revert_button"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="CLEAR"/>
+                    android:background="#ffffffff"
+                    app:srcCompat="@drawable/ic_revert" />
+
+                <ImageButton
+                    android:id="@+id/check_all_button"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_marginRight="15dp"
+                    android:background="#ffffffff"
+                    app:srcCompat="@drawable/ic_check_all"/>
+
             </LinearLayout>
 
         </LinearLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </RelativeLayout>
 
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer">
 
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

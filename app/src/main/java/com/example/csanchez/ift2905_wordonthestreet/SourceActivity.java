@@ -86,6 +86,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
         navigationView.getMenu().findItem(R.id.nav_fav).setEnabled(false);
 
         ((TextView)findViewById(R.id.select_source_instr)).setText("Select " + categoryName + " sources");
+
         SourceActivity.SourceFetcher sourcesFetcher = new SourceActivity.SourceFetcher();
         sourcesFetcher.execute();
     }
@@ -187,9 +188,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                 Source source =  idsToSources.get(sourceName.trim());
                 if (source.category.equals(categoryName)) resultCount++;
             }
-//            resultCount = sourceNames.length;
         }
-
 
         Intent intent = new Intent();
         intent.putExtra("CategoryName", categoryName);

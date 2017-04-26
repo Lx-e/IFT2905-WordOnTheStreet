@@ -115,7 +115,6 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
                 String desc = prefs.getString("H_title"+((Integer)position).toString(), null);
 
-
                 Intent intent = new Intent(getApplicationContext(), SingleNewsExpand.class);
 
                 intent.putExtra("date", newsDate);
