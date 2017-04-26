@@ -92,7 +92,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
     protected void loadFavoriteSources() {
 
-        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString(categoryName+"Sources", "Nothing");//"No name defined" is the default value.
+        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
         Log.v("TAG", "RETRIEVED FAVORITE SOURCES: "+sourcesStr);
 
         if(sourcesStr == null || sourcesStr.equals("Nothing")) return;
@@ -118,8 +118,8 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
             for (Source source: favoriteSources) { sourcesBuffer.append(source.id).append(","); }
 
         SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
-        editor.remove(categoryName+"Sources");
-        editor.putString(categoryName+"Sources", sourcesBuffer.toString());
+        editor.remove("FavoriteSources");
+        editor.putString("FavoriteSources", sourcesBuffer.toString());
         editor.commit();
         Log.v("TAG", "SAVING FAVORITE "+categoryName+" SOURCES: "+ sourcesBuffer.toString());
     }
@@ -179,21 +179,21 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
-        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString(categoryName+"Sources", "Nothing");//"No name defined" is the default value.
+        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
         int resultCount = 0;
         if(sourcesStr != null && !sourcesStr.equals("Nothing")) {
             String[] sourceNames = sourcesStr.split(",");
-//            for (String sourceName: sourceNames) {
-//                Source source =  idsToSources.get(sourceName.trim());
-//                if (source.category.equals(categoryName)) resultCount++;
-//            }
-            resultCount = sourceNames.length;
+            for (String sourceName: sourceNames) {
+                Source source =  idsToSources.get(sourceName.trim());
+                if (source.category.equals(categoryName)) resultCount++;
+            }
+//            resultCount = sourceNames.length;
         }
 
 
         Intent intent = new Intent();
         intent.putExtra("CategoryName", categoryName);
-        intent.putExtra(categoryName+"Count", resultCount);
+        intent.putExtra("Count", resultCount);
         setResult(RESULT_OK, intent);
         finish();
     }

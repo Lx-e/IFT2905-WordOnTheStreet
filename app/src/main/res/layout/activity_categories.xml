@@ -44,7 +44,6 @@
             android:textSize="20dp"
             android:textAlignment="center"
             android:text="Select News Category"/>
-        <!--android:theme="@style/TextAppearance.FavoritesInstructions"-->
 
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
