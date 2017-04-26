@@ -69,15 +69,20 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
         toolbar.setLogo(getDrawable(R.drawable.wots2));
 
-//        toolbar.setTitle("Select favorite categories");
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        setSupportActionBar(toolbar);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().findItem(R.id.nav_fav).setEnabled(false);
+        changeTypeface(navigationView);
+
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
 
 
         list = (ListView) findViewById(R.id.listView_categories);
@@ -141,17 +146,34 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         Log.v("TAG", "SAVING FAVORITE CATEGORIES: "+ categoriesBuffer.toString());
     }
 
-    //Inspiré de http://stackoverflow.com/questions/14509552/uncheck-all-checbox-in-listview-in-android
-    private void clearCheckboxes(ViewGroup vg) {
-        for (int i = 0; i < vg.getChildCount(); i++) {
-            View v = vg.getChildAt(i);
-            if (v instanceof CheckBox) {
-                ((CheckBox) v).setChecked(false);
-            } else if (v instanceof ViewGroup) {
-                clearCheckboxes((ViewGroup) v);
-            }
-        }
+    private void applyFontToItem(MenuItem item, Typeface font) {
+        SpannableString mNewTitle = new SpannableString(item.getTitle());
+        mNewTitle.setSpan(new CustomTypefaceSpan("", font, 30), 0 ,
+                mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        item.setTitle(mNewTitle);
     }
+
+    private void changeTypeface(NavigationView navigationView){
+        FontTypeface fontTypeface = new FontTypeface(this);
+        Typeface typeface = fontTypeface.getTypefaceAndroid();
+
+        MenuItem item;
+
+        item = navigationView.getMenu().findItem(R.id.nav_book);
+        item.setTitle("Bookmarks");
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_fav);
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_history);
+        applyFontToItem(item, typeface);
+
+        item = navigationView.getMenu().findItem(R.id.nav_settings);
+        applyFontToItem(item, typeface);
+
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -177,30 +199,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                         categoryToSourceCount.get(categoryName) : 0;
                 categoryToFavoriteSourceCount.put(categoryName, favoriteCount);
                 countViewsByCategories.get(categoryName).setText((CharSequence)("(" + favoriteCount + "/" + sourceCount + ")"));
-//                countViewsByCategories.get(categoryName).invalidate();
-//                countViewsByCategories.get(categoryName).postInvalidate();
-
-//                final TextView updatedView = countViewsByCategories.get(categoryName);
-//                final String newText = "(" + favoriteCount + "/" + sourceCount + ")";
-//                ListView items = ((ListView)findViewById(R.id.listView_categories));
-//                for (int i = 0; i < items.getChildCount(); i++) {
-//                    ViewGroup child = (ViewGroup)items.getChildAt(i);
-//                    TextView tv = (TextView)((ViewGroup)((ViewGroup)items.getChildAt(0)).getChildAt(0)).getChildAt(0);
-//                    if (categoryName.equals(tv.getText())) {
-//                        TextView tv2 = (TextView)((ViewGroup)((ViewGroup)items.getChildAt(0)).getChildAt(0)).getChildAt(1);
-//                        tv2.setText(newText);
-//                        break;
-//                    }
-//
-//                }
-
-
-//                Runnable updateTextView = new Runnable() { public void run() {updatedView.setText(newText);}};
-//                runOnUiThread(updateTextView);
-
             }
-
-
         }
     }
 
@@ -215,29 +214,6 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra("Category", categoryName.toString());
         startActivityForResult(intent, 0);
         return;
-
-//        if (v instanceof ImageButton) {
-//            // Click was on the source config button
-//            Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
-//            intent.putExtra("Category", categoryName.toString());
-//            startActivityForResult(intent, 0);
-//            return;
-//        }
-//
-//        // Click was on the category item or its checkbox
-//        if (favoriteCategories.contains(categoryName)) {
-//            favoriteCategories.remove(categoryName);
-//            Log.v("TAG", "Favorite category disabled: " + categoryName);
-//
-//        }
-//        else {
-//            favoriteCategories.add(categoryName);
-//            Log.v("TAG", "Favorite category enabled: " + categoryName);
-//        }
-//
-//        CheckBox cb = (v instanceof CheckBox) ? null : (CheckBox)v.findViewById(R.id.checkbox);
-//        if (cb != null) cb.setChecked(!cb.isChecked());
-
     }
 
     @Override
@@ -285,7 +261,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
             //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
             SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
             Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getApplicationContext(), ScreenSlidePagerActivity.class);
+            Intent intent = new Intent(getApplicationContext(), PagerCarlos.class);
             startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -328,22 +304,6 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         protected void onPostExecute(final Source[] sources) {
-
-            ((Button)findViewById(R.id.clear_cat_custom)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    clearCheckboxes(list);
-                    favoriteCategories.clear();
-                    saveFavoriteCategories();
-                }
-            });
-
-            ((Button)findViewById(R.id.save_cat_button)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveFavoriteCategories();
-                }
-            });
 
             list.setAdapter(new BaseAdapter() {
                 @Override
