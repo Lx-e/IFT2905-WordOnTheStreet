@@ -121,22 +121,6 @@ public class CategoryActivityCarlos extends AppCompatActivity implements View.On
         @Override
         protected void onPostExecute(final Source[] sources) {
 
-//            ((Button)findViewById(R.id.clear_cat_custom)).setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    clearCheckboxes(list);
-//                    favoriteCategories.clear();
-//                    saveFavoriteCategories();
-//                }
-//            });
-//
-//            ((Button)findViewById(R.id.save_cat_button)).setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    saveFavoriteCategories();
-//                }
-//            });
-
             list.setAdapter(new BaseAdapter() {
                 @Override
                 public int getCount() {

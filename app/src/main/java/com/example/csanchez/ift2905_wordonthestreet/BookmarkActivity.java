@@ -152,7 +152,7 @@ public class BookmarkActivity extends AppCompatActivity implements View.OnClickL
             //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
             SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
             Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getApplicationContext(), ScreenSlidePagerActivity.class);
+            Intent intent = new Intent(getApplicationContext(), PagerCarlos.class);
             startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
