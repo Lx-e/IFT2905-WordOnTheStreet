@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_fav) {
             Toast.makeText(getApplicationContext(), "favorites", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), CategoryActivity.class));
+            startActivity(new Intent(getApplicationContext(), CategoryActivityCarlos.class));
         }
         else if (id == R.id.nav_history) {
             Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
             SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
             Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getApplicationContext(), ScreenSlidePagerActivity.class);
+            Intent intent = new Intent(getApplicationContext(), PagerCarlos.class);
             startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -279,6 +279,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         applyFontToItem(item, typeface);
     }
 
-
+    @Override
+    public void onRestart()
+    {
+        super.onRestart();
+        finish();
+        startActivity(getIntent());
+    }
 
 }

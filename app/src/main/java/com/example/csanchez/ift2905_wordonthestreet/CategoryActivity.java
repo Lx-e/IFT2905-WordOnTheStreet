@@ -177,7 +177,7 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         if (requestCode == 0) {
             if(resultCode == RESULT_OK) {
                 String categoryName = data.getStringExtra("CategoryName");
-                int favoriteCount = data.getIntExtra("FavoriteCount", 0);
+                int favoriteCount = data.getIntExtra(categoryName+"Count", 0);
                 int sourceCount = categoryToSourceCount.containsKey(categoryName) ?
                         categoryToSourceCount.get(categoryName) : 0;
                 categoryToFavoriteSourceCount.put(categoryName, favoriteCount);
