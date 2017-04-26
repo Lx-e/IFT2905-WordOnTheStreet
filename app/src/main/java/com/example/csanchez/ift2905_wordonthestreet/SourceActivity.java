@@ -76,7 +76,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
     protected void loadFavoriteSources() {
 
-        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
+        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString(categoryName+"Sources", "Nothing");//"No name defined" is the default value.
         Log.v("TAG", "RETRIEVED FAVORITE SOURCES: "+sourcesStr);
 
         if(sourcesStr == null || sourcesStr.equals("Nothing")) return;
@@ -85,7 +85,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
 
         for (String sourceIdStr: sourceIds) {
             sourceIdStr = sourceIdStr.trim();
-            Log.v("TAG", "Parsed: " + sourceIdStr);
+            Log.v("TAG", "Parsed from "+categoryName+": " + sourceIdStr);
             if (sourceIdStr.length() > 0 && idsToSources.containsKey(sourceIdStr)) {
                 Source source =  idsToSources.get(sourceIdStr);
                 if (!favoriteSources.contains(source)) favoriteSources.add(source);
@@ -102,10 +102,10 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
             for (Source source: favoriteSources) { sourcesBuffer.append(source.id).append(","); }
 
         SharedPreferences.Editor editor = getSharedPreferences("SavedData", MODE_PRIVATE).edit();
-        editor.remove("FavoriteSources");
-        editor.putString("FavoriteSources", sourcesBuffer.toString());
+        editor.remove(categoryName+"Sources");
+        editor.putString(categoryName+"Sources", sourcesBuffer.toString());
         editor.commit();
-        Log.v("TAG", "SAVING FAVORITE SOURCES: "+ sourcesBuffer.toString());
+        Log.v("TAG", "SAVING FAVORITE "+categoryName+" SOURCES: "+ sourcesBuffer.toString());
     }
 
     //Inspiré de http://stackoverflow.com/questions/14509552/uncheck-all-checbox-in-listview-in-android
@@ -123,20 +123,21 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
-        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
+        String sourcesStr = getSharedPreferences("SavedData", MODE_PRIVATE).getString(categoryName+"Sources", "Nothing");//"No name defined" is the default value.
         int resultCount = 0;
         if(sourcesStr != null && !sourcesStr.equals("Nothing")) {
             String[] sourceNames = sourcesStr.split(",");
-            for (String sourceName: sourceNames) {
-                Source source =  idsToSources.get(sourceName.trim());
-                if (source.category.equals(categoryName)) resultCount++;
-            }
+//            for (String sourceName: sourceNames) {
+//                Source source =  idsToSources.get(sourceName.trim());
+//                if (source.category.equals(categoryName)) resultCount++;
+//            }
+            resultCount = sourceNames.length;
         }
 
 
         Intent intent = new Intent();
         intent.putExtra("CategoryName", categoryName);
-        intent.putExtra("FavoriteCount", resultCount);
+        intent.putExtra(categoryName+"Count", resultCount);
         setResult(RESULT_OK, intent);
         finish();
     }

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -85,7 +86,7 @@ public class ScreenSlidePageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_screen_slide_page, container, false);
-        ListView newsList = (ListView)scrollView.findViewById(R.id.listView_main2);
+        ListView newsList = (ListView) scrollView.findViewById(R.id.listView_main2);
 
         newsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
