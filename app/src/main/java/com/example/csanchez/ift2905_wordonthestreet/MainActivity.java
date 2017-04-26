@@ -270,17 +270,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         applyFontToItem(item, typeface);
 
         item = navigationView.getMenu().findItem(R.id.nav_fav);
-//        item.setTitle("Galery");
         applyFontToItem(item, typeface);
 
         item = navigationView.getMenu().findItem(R.id.nav_history);
-//        item.setTitle("Slideshow");
         applyFontToItem(item, typeface);
 
         item = navigationView.getMenu().findItem(R.id.nav_settings);
-//        item.setTitle("Manage");
         applyFontToItem(item, typeface);
-
     }
 
 
