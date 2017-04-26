@@ -69,21 +69,16 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
         toolbar.setLogo(getDrawable(R.drawable.wots2));
 
+//        toolbar.setTitle("Select favorite categories");
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
+        setSupportActionBar(toolbar);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
-        navigationView.setNavigationItemSelectedListener(this);
-        changeTypeface(navigationView);
-
-        navigationView.getMenu().findItem(R.id.nav_fav).setEnabled(false);
 
         list = (ListView) findViewById(R.id.listView_categories);
 
@@ -182,23 +177,34 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
                         categoryToSourceCount.get(categoryName) : 0;
                 categoryToFavoriteSourceCount.put(categoryName, favoriteCount);
                 countViewsByCategories.get(categoryName).setText((CharSequence)("(" + favoriteCount + "/" + sourceCount + ")"));
+//                countViewsByCategories.get(categoryName).invalidate();
+//                countViewsByCategories.get(categoryName).postInvalidate();
 
-                final TextView updatedView = countViewsByCategories.get(categoryName);
-                final String newText = "(" + favoriteCount + "/" + sourceCount + ")";
-                ListView items = ((ListView)findViewById(R.id.listView_categories));
+//                final TextView updatedView = countViewsByCategories.get(categoryName);
+//                final String newText = "(" + favoriteCount + "/" + sourceCount + ")";
+//                ListView items = ((ListView)findViewById(R.id.listView_categories));
+//                for (int i = 0; i < items.getChildCount(); i++) {
+//                    ViewGroup child = (ViewGroup)items.getChildAt(i);
+//                    TextView tv = (TextView)((ViewGroup)((ViewGroup)items.getChildAt(0)).getChildAt(0)).getChildAt(0);
+//                    if (categoryName.equals(tv.getText())) {
+//                        TextView tv2 = (TextView)((ViewGroup)((ViewGroup)items.getChildAt(0)).getChildAt(0)).getChildAt(1);
+//                        tv2.setText(newText);
+//                        break;
+//                    }
+//
+//                }
 
-                for (int i = 0; i < items.getChildCount(); i++) {
-                    ViewGroup sourceItem = (ViewGroup)((ViewGroup)items.getChildAt(i)).getChildAt(0);
-                    TextView nameView = (TextView)sourceItem.getChildAt(0);
-                    TextView countView = (TextView)sourceItem.getChildAt(1);
-                    if (categoryName.equals(nameView.getText())) {
-                        countView.setText(newText);
-                        break;
-                    }
-                }
+
+//                Runnable updateTextView = new Runnable() { public void run() {updatedView.setText(newText);}};
+//                runOnUiThread(updateTextView);
+
             }
+
+
         }
     }
+
+
 
     @Override
     public void onClick(View v) {
@@ -209,8 +215,30 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra("Category", categoryName.toString());
         startActivityForResult(intent, 0);
         return;
-    }
 
+//        if (v instanceof ImageButton) {
+//            // Click was on the source config button
+//            Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
+//            intent.putExtra("Category", categoryName.toString());
+//            startActivityForResult(intent, 0);
+//            return;
+//        }
+//
+//        // Click was on the category item or its checkbox
+//        if (favoriteCategories.contains(categoryName)) {
+//            favoriteCategories.remove(categoryName);
+//            Log.v("TAG", "Favorite category disabled: " + categoryName);
+//
+//        }
+//        else {
+//            favoriteCategories.add(categoryName);
+//            Log.v("TAG", "Favorite category enabled: " + categoryName);
+//        }
+//
+//        CheckBox cb = (v instanceof CheckBox) ? null : (CheckBox)v.findViewById(R.id.checkbox);
+//        if (cb != null) cb.setChecked(!cb.isChecked());
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -221,13 +249,13 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
-                drawer.openDrawer(GravityCompat.START);
-                return true;
-        }
+//        switch (item.getItemId())
+//        {
+//            case android.R.id.home:
+//                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+//                drawer.openDrawer(GravityCompat.START);
+//                return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -262,36 +290,9 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        finish();
         return true;
     }
 
-    private void applyFontToItem(MenuItem item, Typeface font) {
-        SpannableString mNewTitle = new SpannableString(item.getTitle());
-        mNewTitle.setSpan(new CustomTypefaceSpan("", font, 30), 0 ,
-                mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        item.setTitle(mNewTitle);
-    }
-
-    private void changeTypeface(NavigationView navigationView){
-        FontTypeface fontTypeface = new FontTypeface(this);
-        Typeface typeface = fontTypeface.getTypefaceAndroid();
-
-        MenuItem item;
-
-        item = navigationView.getMenu().findItem(R.id.nav_book);
-        item.setTitle("Bookmarks");
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_fav);
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_history);
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_settings);
-        applyFontToItem(item, typeface);
-    }
 
     public class CategoriesFetcher extends AsyncTask<Object, Object, Source[]> {
 
@@ -327,6 +328,22 @@ public class CategoryActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         protected void onPostExecute(final Source[] sources) {
+
+            ((Button)findViewById(R.id.clear_cat_custom)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clearCheckboxes(list);
+                    favoriteCategories.clear();
+                    saveFavoriteCategories();
+                }
+            });
+
+            ((Button)findViewById(R.id.save_cat_button)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveFavoriteCategories();
+                }
+            });
 
             list.setAdapter(new BaseAdapter() {
                 @Override
