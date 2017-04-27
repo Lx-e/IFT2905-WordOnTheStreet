@@ -38,7 +38,7 @@
             android:layout_below="@+id/app_bar_layout">
 
             <ListView
-                android:id="@+id/listviewb"
+                android:id="@+id/listviewb2"
                 android:layout_width="match_parent"
                 android:layout_height="454dp"
                 android:divider="@android:color/black"
@@ -46,10 +46,10 @@
                 android:layout_weight="0.89" />
 
             <Button
-                android:id="@+id/button6"
+                android:id="@+id/button7"
                 android:layout_width="match_parent"
                 android:layout_height="43dp"
-                android:text="Clear ALL bookmarks" />
+                android:text="Clear history" />
         </LinearLayout>
 
     </RelativeLayout>

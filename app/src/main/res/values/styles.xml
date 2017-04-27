@@ -6,9 +6,13 @@
         <item name="colorPrimary">#141414</item>
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorAccent">@color/colorAccent</item>
-
-
     </style>
+
+    <style name="AppTheme.Main">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">false</item>
+    </style>
+
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -20,6 +24,19 @@
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="TextAppearance.SingleSourceName" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">#f0f0f0</item>
+        <item name="android:background">#bc000000</item>
+    </style>
+
+    <style name="TextAppearance.SingleSourceCount" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">14dp</item>
+        <item name="android:textColor">#f0f0f0</item>
+        <item name="android:background">#bc000000</item>
+    </style>
 
 </resources>

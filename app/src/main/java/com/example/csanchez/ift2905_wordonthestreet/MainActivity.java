@@ -51,24 +51,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        toolbar.getMenu().clear();
         toolbar.setBackground(new ColorDrawable(0x000000FF));
-        getSupportActionBar().setTitle("");
-        getSupportActionBar().setSubtitle("");
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0x000000FF));
-//        getSupportActionBar().setBackgroundDrawable(getDrawable(R.drawable.wots));
-        getSupportActionBar().setLogo(getDrawable(R.drawable.wots));
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        toolbar.setBackgroundDrawable(new ColorDrawable(0x000000FF));
+        toolbar.setLogo(getDrawable(R.drawable.wots2));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -78,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        changeTypeface(navigationView);
 
         list = (ListView)findViewById(R.id.listView_main);
 
@@ -86,10 +78,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         changeTypeface(navigationView);
 
-
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-
 
                 TextView t = (TextView) view.findViewById(R.id.hiddenurl);
                 String link = t.getText().toString();
@@ -104,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent.putExtra("date", newsDate);
                 intent.putExtra("desc", desc);
                 intent.putExtra("link", link);
+                intent.putExtra("caller", "MainActivity");
                 startActivity(intent);
             }
         });
@@ -118,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             try {
                 SharedPreferences prefs = getSharedPreferences("SavedData", MODE_PRIVATE);
-                String sourcesStr = prefs.getString("CustomSources", "Nothing");//"No name defined" is the default value.
+                String sourcesStr = prefs.getString("FavoriteSources", "Nothing");//"No name defined" is the default value.
                 Log.v("TAG", "RETRIEVED: "+sourcesStr);
 
                 if(sourcesStr.equals("Nothing")){
@@ -236,29 +227,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_fav) {
             Toast.makeText(getApplicationContext(), "favorites", Toast.LENGTH_SHORT).show();
-
-            //Intent intent = new Intent(getApplicationContext(), FilterActivity.class);
-            Intent intent = new Intent(getApplicationContext(), SourceActivity.class);
-            startActivity(intent);
-
-
-        } else if (id == R.id.nav_tags) {
-            Toast.makeText(getApplicationContext(), "tags", Toast.LENGTH_SHORT).show();
-
-        } else if (id == R.id.nav_history) {
+            startActivity(new Intent(getApplicationContext(), CategoryActivity.class));
+        }
+        else if (id == R.id.nav_history) {
             Toast.makeText(getApplicationContext(), "history", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getApplicationContext(), HistoryActivity.class));
+        }
+        else if (id == R.id.nav_book) {
+            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+            int size = prefs.getInt("bookmark_size", 0);
 
-
-        } else if (id == R.id.nav_book) {
-            Toast.makeText(getApplicationContext(), "bookmarks", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "bookmarks"+((Integer)size).toString(), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(), BookmarkActivity.class);
             startActivity(intent);
-
-        } else if (id == R.id.nav_settings) {
+        }
+        else if (id == R.id.nav_settings) {
             //Toast.makeText(getApplicationContext(), "settings", Toast.LENGTH_SHORT).show();
             SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
             Toast.makeText(getApplicationContext(), ((Integer)prefs.getInt("bookmark_size",0)).toString(), Toast.LENGTH_SHORT).show();
-
+            Intent intent = new Intent(getApplicationContext(), PagerCarlos.class);
+            startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -283,23 +271,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         applyFontToItem(item, typeface);
 
         item = navigationView.getMenu().findItem(R.id.nav_fav);
-//        item.setTitle("Galery");
         applyFontToItem(item, typeface);
 
         item = navigationView.getMenu().findItem(R.id.nav_history);
-//        item.setTitle("Slideshow");
         applyFontToItem(item, typeface);
 
         item = navigationView.getMenu().findItem(R.id.nav_settings);
-//        item.setTitle("Manage");
-        applyFontToItem(item, typeface);
-
-        item = navigationView.getMenu().findItem(R.id.nav_tags);
-//        item.setTitle("Share");
         applyFontToItem(item, typeface);
 
     }
 
-
+    @Override
+    public void onRestart()
+    {
+        super.onRestart();
+        finish();
+        startActivity(getIntent());
+    }
 
 }

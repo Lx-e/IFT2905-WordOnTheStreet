@@ -52,16 +52,16 @@ import java.util.List;
 import android.widget.PopupMenu;
 
 
-public class BookmarkActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class HistoryActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     ListView list;
     MyAdapter adapter;
-    private String[] bookmarks;
+    private String[] hist;
 
     Button reset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bookmarks);
+        setContentView(R.layout.history_activity);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.getMenu().clear();
@@ -85,42 +85,42 @@ public class BookmarkActivity extends AppCompatActivity implements View.OnClickL
         navigationView.setNavigationItemSelectedListener(this);
         changeTypeface(navigationView);
 
-        navigationView.getMenu().findItem(R.id.nav_book).setEnabled(false);
+        navigationView.getMenu().findItem(R.id.nav_history).setEnabled(false);
 
-        SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
-        int size = prefs.getInt("bookmark_size", 0);
+        SharedPreferences prefs = getSharedPreferences("history", MODE_PRIVATE);
+        int size = prefs.getInt("history_size", 0);
         String restored = "";
         String link = "";
-        bookmarks = new String[size+1];
+        hist = new String[size+1];
         for(int i = 0; i<size+1; i++){
-            link = "title"+((Integer)i).toString();
+            link = "H_title"+((Integer)i).toString();
             restored = prefs.getString(link, null);
-            bookmarks[i] = restored;
+            hist[i] = restored;
         }
 
-        reset = (Button)findViewById(R.id.button6);
+        reset = (Button)findViewById(R.id.button7);
         reset.setOnClickListener(this);
-        list = (ListView)findViewById(R.id.listviewb);
+        list = (ListView)findViewById(R.id.listviewb2);
         adapter = new MyAdapter();
         list.setAdapter(adapter);
+
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
+                SharedPreferences prefs = getSharedPreferences("history", MODE_PRIVATE);
 
 
-                String link = prefs.getString("url"+((Integer)position).toString(), null);
+                String link = prefs.getString("H_url"+((Integer)position).toString(), null);
 
-                String newsDate = prefs.getString("date"+((Integer)position).toString(), null);
+                String newsDate = prefs.getString("H_date"+((Integer)position).toString(), null);
 
-                String desc = prefs.getString("title"+((Integer)position).toString(), null);
-
+                String desc = prefs.getString("H_title"+((Integer)position).toString(), null);
 
                 Intent intent = new Intent(getApplicationContext(), SingleNewsExpand.class);
 
                 intent.putExtra("date", newsDate);
                 intent.putExtra("desc", desc);
                 intent.putExtra("link", link);
-                intent.putExtra("caller", "BookmarkActivity");
+                intent.putExtra("caller", "HistoryActivity");
                 startActivity(intent);
             }
         });
@@ -214,8 +214,8 @@ public class BookmarkActivity extends AppCompatActivity implements View.OnClickL
         }
         @Override
         public int getCount() {
-            SharedPreferences prefs = getSharedPreferences("bookmarks", MODE_PRIVATE);
-            int size = prefs.getInt("bookmark_size", 0);
+            SharedPreferences prefs = getSharedPreferences("history", MODE_PRIVATE);
+            int size = prefs.getInt("history_size", 0);
             return size;
         }
 
@@ -237,14 +237,14 @@ public class BookmarkActivity extends AppCompatActivity implements View.OnClickL
                 v = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
 
             TextView tv = (TextView)v.findViewById(android.R.id.text1);
-            tv.setText(bookmarks[position]);
+            tv.setText(hist[position]);
 
             return v;
         }
     }
     public void onClick(View v){
-        this.getSharedPreferences("bookmarks", 0).edit().clear().commit();
-        startActivity(new Intent(this, BookmarkActivity.class));
+        this.getSharedPreferences("history", 0).edit().clear().commit();
+        startActivity(new Intent(this, HistoryActivity.class));
         finish();
     }
     @Override
